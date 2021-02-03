@@ -1,0 +1,832 @@
+From 37aeea70d0629cf65b469018ea4ed88278f0cc01 Mon Sep 17 00:00:00 2001
+From: Atom Long <atom.long@hotmail.com>
+Date: Mon, 25 Jan 2021 11:25:20 +0800
+Subject: [PATCH 2/3] Add new newlib patches
+
+---
+ .../0010-port-for-cortex-m4.patch             | 169 ++++++++++++++++++
+ .../0010-port-for-cortex-m4.patch             | 168 +++++++++++++++++
+ .../0010-port-for-cortex-m4.patch             | 168 +++++++++++++++++
+ .../3.2.0/0010-port-for-cortex-m4.patch       | 138 ++++++++++++++
+ .../3.3.0/0010-port-for-cortex-m4.patch       | 138 ++++++++++++++
+ 5 files changed, 781 insertions(+)
+ create mode 100644 packages/newlib/2.5.0.20171222/0010-port-for-cortex-m4.patch
+ create mode 100644 packages/newlib/3.0.0.20180831/0010-port-for-cortex-m4.patch
+ create mode 100644 packages/newlib/3.1.0.20181231/0010-port-for-cortex-m4.patch
+ create mode 100644 packages/newlib/3.2.0/0010-port-for-cortex-m4.patch
+ create mode 100644 packages/newlib/3.3.0/0010-port-for-cortex-m4.patch
+
+diff --git a/packages/newlib/2.5.0.20171222/0010-port-for-cortex-m4.patch b/packages/newlib/2.5.0.20171222/0010-port-for-cortex-m4.patch
+new file mode 100644
+index 00000000..13db9098
+--- /dev/null
++++ b/packages/newlib/2.5.0.20171222/0010-port-for-cortex-m4.patch
+@@ -0,0 +1,169 @@
++diff -durN newlib-2.5.0.20171222.orig/libgloss/arm/_kill.c newlib-2.5.0.20171222/libgloss/arm/_kill.c
++--- newlib-2.5.0.20171222.orig/libgloss/arm/_kill.c	2017-12-20 01:58:06.000000000 +0800
+++++ newlib-2.5.0.20171222/libgloss/arm/_kill.c	2018-12-20 21:14:34.718750000 +0800
++@@ -4,7 +4,9 @@
++ 
++ int _kill _PARAMS ((int, int));
++ 
++-int
+++#define DEFAULTSYSCALL __attribute__((weak))
+++
+++int DEFAULTSYSCALL
++ _kill (int pid, int sig)
++ {
++   (void) pid; (void) sig;
++diff -durN newlib-2.5.0.20171222.orig/libgloss/arm/syscalls.c newlib-2.5.0.20171222/libgloss/arm/syscalls.c
++--- newlib-2.5.0.20171222.orig/libgloss/arm/syscalls.c	2017-12-20 01:58:06.000000000 +0800
+++++ newlib-2.5.0.20171222/libgloss/arm/syscalls.c	2018-12-20 21:17:51.328125000 +0800
++@@ -17,31 +17,33 @@
++ #include <sys/wait.h>
++ #include "swi.h"
++ 
+++#define DEFAULTSYSCALL __attribute__((weak))
+++
++ /* Forward prototypes.  */
++-int     _system     _PARAMS ((const char *));
++-int     _rename     _PARAMS ((const char *, const char *));
++-int     _isatty		_PARAMS ((int));
++-clock_t _times		_PARAMS ((struct tms *));
++-int     _gettimeofday	_PARAMS ((struct timeval *, void *));
++-int     _unlink		_PARAMS ((const char *));
++-int     _link 		_PARAMS ((void));
++-int     _stat 		_PARAMS ((const char *, struct stat *));
++-int     _fstat 		_PARAMS ((int, struct stat *));
++-int	_swistat	_PARAMS ((int fd, struct stat * st));
++-caddr_t _sbrk		_PARAMS ((int));
++-int     _getpid		_PARAMS ((int));
++-int     _close		_PARAMS ((int));
++-clock_t _clock		_PARAMS ((void));
++-int     _swiclose	_PARAMS ((int));
++-int     _open		_PARAMS ((const char *, int, ...));
++-int     _swiopen	_PARAMS ((const char *, int));
++-int     _write 		_PARAMS ((int, char *, int));
++-int     _swiwrite	_PARAMS ((int, char *, int));
++-int     _lseek		_PARAMS ((int, int, int));
++-int     _swilseek	_PARAMS ((int, int, int));
++-int     _read		_PARAMS ((int, char *, int));
++-int     _swiread	_PARAMS ((int, char *, int));
++-void    initialise_monitor_handles _PARAMS ((void));
+++int     DEFAULTSYSCALL _system     _PARAMS ((const char *));
+++int     DEFAULTSYSCALL _rename     _PARAMS ((const char *, const char *));
+++int     DEFAULTSYSCALL _isatty		_PARAMS ((int));
+++clock_t DEFAULTSYSCALL _times		_PARAMS ((struct tms *));
+++int     DEFAULTSYSCALL _gettimeofday	_PARAMS ((struct timeval *, void *));
+++int     DEFAULTSYSCALL _unlink		_PARAMS ((const char *));
+++int     DEFAULTSYSCALL _link 		_PARAMS ((void));
+++int     DEFAULTSYSCALL _stat 		_PARAMS ((const char *, struct stat *));
+++int     DEFAULTSYSCALL _fstat 		_PARAMS ((int, struct stat *));
+++int		DEFAULTSYSCALL _swistat	_PARAMS ((int fd, struct stat * st));
+++caddr_t DEFAULTSYSCALL _sbrk		_PARAMS ((int));
+++int     DEFAULTSYSCALL _getpid		_PARAMS ((int));
+++int     DEFAULTSYSCALL _close		_PARAMS ((int));
+++clock_t DEFAULTSYSCALL _clock		_PARAMS ((void));
+++int     DEFAULTSYSCALL _swiclose	_PARAMS ((int));
+++int     DEFAULTSYSCALL _open		_PARAMS ((const char *, int, ...));
+++int     DEFAULTSYSCALL _swiopen	_PARAMS ((const char *, int));
+++int     DEFAULTSYSCALL _write 		_PARAMS ((int, char *, int));
+++int     DEFAULTSYSCALL _swiwrite	_PARAMS ((int, char *, int));
+++int     DEFAULTSYSCALL _lseek		_PARAMS ((int, int, int));
+++int     DEFAULTSYSCALL _swilseek	_PARAMS ((int, int, int));
+++int     DEFAULTSYSCALL _read		_PARAMS ((int, char *, int));
+++int     DEFAULTSYSCALL _swiread	_PARAMS ((int, char *, int));
+++void    DEFAULTSYSCALL initialise_monitor_handles _PARAMS ((void));
++ 
++ static int	checkerror	_PARAMS ((int));
++ static int	error		_PARAMS ((int));
++diff -durN newlib-2.5.0.20171222.orig/newlib/libc/sys/arm/crt0.S newlib-2.5.0.20171222/newlib/libc/sys/arm/crt0.S
++--- newlib-2.5.0.20171222.orig/newlib/libc/sys/arm/crt0.S	2017-12-20 01:58:06.000000000 +0800
+++++ newlib-2.5.0.20171222/newlib/libc/sys/arm/crt0.S	2018-12-20 20:24:32.155356800 +0800
++@@ -137,7 +137,7 @@
++ 	beq	.LC27
++ 
++ 	/*  Allow slop for stack overflow handling and small frames.  */
++-#ifdef __ARM_ARCH_6M__
+++#if defined(__ARM_ARCH_6M__) || defined(__ARM_ARCH_8M_BASE__)
++ 	adds	r2, #128
++ 	adds	r2, #128
++ 	mov	sl, r2
++diff -durN newlib-2.5.0.20171222.orig/newlib/libc/sys/arm/syscalls.c newlib-2.5.0.20171222/newlib/libc/sys/arm/syscalls.c
++--- newlib-2.5.0.20171222.orig/newlib/libc/sys/arm/syscalls.c	2017-12-20 01:58:06.000000000 +0800
+++++ newlib-2.5.0.20171222/newlib/libc/sys/arm/syscalls.c	2018-12-20 21:19:54.828125000 +0800
++@@ -17,32 +17,34 @@
++ #include <sys/wait.h>
++ #include "swi.h"
++ 
+++#define DEFAULTSYSCALL __attribute__((weak))
+++
++ /* Forward prototypes.  */
++-int     _system     _PARAMS ((const char *));
++-int     _rename     _PARAMS ((const char *, const char *));
++-int     _isatty		_PARAMS ((int));
++-clock_t _times		_PARAMS ((struct tms *));
++-int     _gettimeofday	_PARAMS ((struct timeval *, void *));
++-void    _raise 		_PARAMS ((void));
++-int     _unlink		_PARAMS ((const char *));
++-int     _link 		_PARAMS ((void));
++-int     _stat 		_PARAMS ((const char *, struct stat *));
++-int     _fstat 		_PARAMS ((int, struct stat *));
++-caddr_t _sbrk		_PARAMS ((int));
++-int     _getpid		_PARAMS ((int));
++-int     _kill		_PARAMS ((int, int));
++-void    _exit		_PARAMS ((int));
++-int     _close		_PARAMS ((int));
++-int     _swiclose	_PARAMS ((int));
++-int     _open		_PARAMS ((const char *, int, ...));
++-int     _swiopen	_PARAMS ((const char *, int));
++-int     _write 		_PARAMS ((int, char *, int));
++-int     _swiwrite	_PARAMS ((int, char *, int));
++-int     _lseek		_PARAMS ((int, int, int));
++-int     _swilseek	_PARAMS ((int, int, int));
++-int     _read		_PARAMS ((int, char *, int));
++-int     _swiread	_PARAMS ((int, char *, int));
++-void    initialise_monitor_handles _PARAMS ((void));
+++int     DEFAULTSYSCALL _system     _PARAMS ((const char *));
+++int     DEFAULTSYSCALL _rename     _PARAMS ((const char *, const char *));
+++int     DEFAULTSYSCALL _isatty		_PARAMS ((int));
+++clock_t DEFAULTSYSCALL _times		_PARAMS ((struct tms *));
+++int     DEFAULTSYSCALL _gettimeofday	_PARAMS ((struct timeval *, void *));
+++void    DEFAULTSYSCALL _raise 		_PARAMS ((void));
+++int     DEFAULTSYSCALL _unlink		_PARAMS ((const char *));
+++int     DEFAULTSYSCALL _link 		_PARAMS ((void));
+++int     DEFAULTSYSCALL _stat 		_PARAMS ((const char *, struct stat *));
+++int     DEFAULTSYSCALL _fstat 		_PARAMS ((int, struct stat *));
+++caddr_t DEFAULTSYSCALL _sbrk		_PARAMS ((int));
+++int     DEFAULTSYSCALL _getpid		_PARAMS ((int));
+++int     DEFAULTSYSCALL _kill		_PARAMS ((int, int));
+++void    DEFAULTSYSCALL _exit		_PARAMS ((int));
+++int     DEFAULTSYSCALL _close		_PARAMS ((int));
+++int     DEFAULTSYSCALL _swiclose	_PARAMS ((int));
+++int     DEFAULTSYSCALL _open		_PARAMS ((const char *, int, ...));
+++int     DEFAULTSYSCALL _swiopen	_PARAMS ((const char *, int));
+++int     DEFAULTSYSCALL _write 		_PARAMS ((int, char *, int));
+++int     DEFAULTSYSCALL _swiwrite	_PARAMS ((int, char *, int));
+++int     DEFAULTSYSCALL _lseek		_PARAMS ((int, int, int));
+++int     DEFAULTSYSCALL _swilseek	_PARAMS ((int, int, int));
+++int     DEFAULTSYSCALL _read		_PARAMS ((int, char *, int));
+++int     DEFAULTSYSCALL _swiread	_PARAMS ((int, char *, int));
+++void    DEFAULTSYSCALL initialise_monitor_handles _PARAMS ((void));
++ 
++ static int	wrap		_PARAMS ((int));
++ static int	error		_PARAMS ((int));
++diff -durN newlib-2.5.0.20171222.orig/newlib/libc/sys/arm/trap.S newlib-2.5.0.20171222/newlib/libc/sys/arm/trap.S
++--- newlib-2.5.0.20171222.orig/newlib/libc/sys/arm/trap.S	2017-12-20 01:58:06.000000000 +0800
+++++ newlib-2.5.0.20171222/newlib/libc/sys/arm/trap.S	2018-12-20 20:22:48.905356800 +0800
++@@ -84,8 +84,14 @@
++         @        should always be "dropped" first to cover the data. This
++         @        protects the data against any events that may try and use
++         @        the stack.
++-
+++#if defined(__ARM_ARCH_6M__) || defined(__ARM_ARCH_8M_BASE__)
+++		mov		r2, sp
+++		mov		r3, ip
+++		SUB		r3, r2, r3
+++		mov		ip, r3
+++#else
++         SUB     ip, sp, ip      @ extra stack required for function
+++#endif
++         @ Add stack extension code here.  If desired a new stack chunk
++         @ can be allocated, and the register state updated suitably.
++ 
+diff --git a/packages/newlib/3.0.0.20180831/0010-port-for-cortex-m4.patch b/packages/newlib/3.0.0.20180831/0010-port-for-cortex-m4.patch
+new file mode 100644
+index 00000000..32993ba0
+--- /dev/null
++++ b/packages/newlib/3.0.0.20180831/0010-port-for-cortex-m4.patch
+@@ -0,0 +1,168 @@
++diff -durN newlib-3.0.0.20180831.orig/libgloss/arm/_kill.c newlib-3.0.0.20180831/libgloss/arm/_kill.c
++--- newlib-3.0.0.20180831.orig/libgloss/arm/_kill.c	2018-09-01 03:40:42.000000000 +0800
+++++ newlib-3.0.0.20180831/libgloss/arm/_kill.c	2019-03-13 13:53:54.584111700 +0800
++@@ -4,7 +4,9 @@
++ 
++ int _kill (int, int);
++ 
++-int
+++#define DEFAULTSYSCALL __attribute__((weak))
+++
+++int DEFAULTSYSCALL
++ _kill (int pid, int sig)
++ {
++   (void) pid; (void) sig;
++diff -durN newlib-3.0.0.20180831.orig/libgloss/arm/syscalls.c newlib-3.0.0.20180831/libgloss/arm/syscalls.c
++--- newlib-3.0.0.20180831.orig/libgloss/arm/syscalls.c	2018-09-01 03:40:42.000000000 +0800
+++++ newlib-3.0.0.20180831/libgloss/arm/syscalls.c	2019-03-13 13:55:44.577762100 +0800
++@@ -17,31 +17,33 @@
++ #include <sys/wait.h>
++ #include "swi.h"
++ 
+++#define DEFAULTSYSCALL __attribute__((weak))
+++
++ /* Forward prototypes.  */
++-int     _system     (const char *);
++-int     _rename     (const char *, const char *);
++-int     _isatty		(int);
++-clock_t _times		(struct tms *);
++-int     _gettimeofday	(struct timeval *, void *);
++-int     _unlink		(const char *);
++-int     _link 		(const char *, const char *);
++-int     _stat 		(const char *, struct stat *);
++-int     _fstat 		(int, struct stat *);
++-int	_swistat	(int fd, struct stat * st);
++-void *  _sbrk		(ptrdiff_t);
++-pid_t   _getpid	        (void);
++-int     _close		(int);
++-clock_t _clock		(void);
++-int     _swiclose	(int);
++-int     _open		(const char *, int, ...);
++-int     _swiopen	(const char *, int);
++-int     _write 		(int, const void *, size_t);
++-int     _swiwrite	(int, const void *, size_t);
++-_off_t  _lseek		(int, _off_t, int);
++-_off_t  _swilseek	(int, _off_t, int);
++-int     _read		(int, void *, size_t);
++-int     _swiread	(int, void *, size_t);
++-void    initialise_monitor_handles (void);
+++int     DEFAULTSYSCALL	_system     (const char *);
+++int     DEFAULTSYSCALL	_rename     (const char *, const char *);
+++int     DEFAULTSYSCALL	_isatty		(int);
+++clock_t DEFAULTSYSCALL	_times		(struct tms *);
+++int     DEFAULTSYSCALL	_gettimeofday	(struct timeval *, void *);
+++int     DEFAULTSYSCALL	_unlink		(const char *);
+++int     DEFAULTSYSCALL	_link 		(const char *, const char *);
+++int     DEFAULTSYSCALL	_stat 		(const char *, struct stat *);
+++int     DEFAULTSYSCALL	_fstat 		(int, struct stat *);
+++int	DEFAULTSYSCALL	_swistat	(int fd, struct stat * st);
+++void *  DEFAULTSYSCALL	_sbrk		(ptrdiff_t);
+++pid_t   DEFAULTSYSCALL	_getpid	        (void);
+++int     DEFAULTSYSCALL	_close		(int);
+++clock_t DEFAULTSYSCALL	_clock		(void);
+++int     DEFAULTSYSCALL	_swiclose	(int);
+++int     DEFAULTSYSCALL	_open		(const char *, int, ...);
+++int     DEFAULTSYSCALL	_swiopen	(const char *, int);
+++int     DEFAULTSYSCALL	_write 		(int, const void *, size_t);
+++int     DEFAULTSYSCALL	_swiwrite	(int, const void *, size_t);
+++_off_t  DEFAULTSYSCALL	_lseek		(int, _off_t, int);
+++_off_t  DEFAULTSYSCALL	_swilseek	(int, _off_t, int);
+++int     DEFAULTSYSCALL	_read		(int, void *, size_t);
+++int     DEFAULTSYSCALL	_swiread	(int, void *, size_t);
+++void    DEFAULTSYSCALL	initialise_monitor_handles (void);
++ 
++ static int	checkerror	(int);
++ static int	error		(int);
++diff -durN newlib-3.0.0.20180831.orig/newlib/libc/sys/arm/crt0.S newlib-3.0.0.20180831/newlib/libc/sys/arm/crt0.S
++--- newlib-3.0.0.20180831.orig/newlib/libc/sys/arm/crt0.S	2018-09-01 03:40:42.000000000 +0800
+++++ newlib-3.0.0.20180831/newlib/libc/sys/arm/crt0.S	2019-03-13 13:56:56.327242800 +0800
++@@ -137,7 +137,7 @@
++ 	beq	.LC27
++ 
++ 	/*  Allow slop for stack overflow handling and small frames.  */
++-#ifdef __ARM_ARCH_6M__
+++#if defined(__ARM_ARCH_6M__) || defined(__ARM_ARCH_8M_BASE__)
++ 	adds	r2, #128
++ 	adds	r2, #128
++ 	mov	sl, r2
++diff -durN newlib-3.0.0.20180831.orig/newlib/libc/sys/arm/syscalls.c newlib-3.0.0.20180831/newlib/libc/sys/arm/syscalls.c
++--- newlib-3.0.0.20180831.orig/newlib/libc/sys/arm/syscalls.c	2018-09-01 03:40:42.000000000 +0800
+++++ newlib-3.0.0.20180831/newlib/libc/sys/arm/syscalls.c	2019-03-13 13:59:12.967310700 +0800
++@@ -17,32 +17,34 @@
++ #include <sys/wait.h>
++ #include "swi.h"
++ 
+++#define DEFAULTSYSCALL __attribute__((weak))
+++
++ /* Forward prototypes.  */
++-int	_system		(const char *);
++-int	_rename		(const char *, const char *);
++-int	_isatty		(int);
++-clock_t _times		(struct tms *);
++-int	_gettimeofday	(struct timeval *, void *);
++-void	_raise		(void);
++-int	_unlink		(const char *);
++-int	_link		(const char *, const char *);
++-int	_stat		(const char *, struct stat *);
++-int	_fstat		(int, struct stat *);
++-void *	_sbrk		(ptrdiff_t);
++-pid_t	_getpid		(void);
++-int	_kill		(int, int);
++-void	_exit		(int);
++-int	_close		(int);
++-int	_swiclose	(int);
++-int	_open		(const char *, int, ...);
++-int	_swiopen	(const char *, int);
++-int	_write		(int, const void *, size_t);
++-int	_swiwrite	(int, const void *, size_t);
++-_off_t	_lseek		(int, _off_t, int);
++-_off_t	_swilseek	(int, _off_t, int);
++-int	_read		(int, void *, size_t);
++-int	_swiread	(int, void *, size_t);
++-void	initialise_monitor_handles (void);
+++int	DEFAULTSYSCALL	_system		(const char *);
+++int	DEFAULTSYSCALL	_rename		(const char *, const char *);
+++int	DEFAULTSYSCALL	_isatty		(int);
+++clock_t DEFAULTSYSCALL	_times		(struct tms *);
+++int	DEFAULTSYSCALL	_gettimeofday	(struct timeval *, void *);
+++void	DEFAULTSYSCALL	_raise		(void);
+++int	DEFAULTSYSCALL	_unlink		(const char *);
+++int	DEFAULTSYSCALL	_link		(const char *, const char *);
+++int	DEFAULTSYSCALL	_stat		(const char *, struct stat *);
+++int	DEFAULTSYSCALL	_fstat		(int, struct stat *);
+++void *	DEFAULTSYSCALL	_sbrk		(ptrdiff_t);
+++pid_t	DEFAULTSYSCALL	_getpid		(void);
+++int	DEFAULTSYSCALL	_kill		(int, int);
+++void	DEFAULTSYSCALL	_exit		(int);
+++int	DEFAULTSYSCALL	_close		(int);
+++int	DEFAULTSYSCALL	_swiclose	(int);
+++int	DEFAULTSYSCALL	_open		(const char *, int, ...);
+++int	DEFAULTSYSCALL	_swiopen	(const char *, int);
+++int	DEFAULTSYSCALL	_write		(int, const void *, size_t);
+++int	DEFAULTSYSCALL	_swiwrite	(int, const void *, size_t);
+++_off_t	DEFAULTSYSCALL	_lseek		(int, _off_t, int);
+++_off_t	DEFAULTSYSCALL	_swilseek	(int, _off_t, int);
+++int	DEFAULTSYSCALL	_read		(int, void *, size_t);
+++int	DEFAULTSYSCALL	_swiread	(int, void *, size_t);
+++void	DEFAULTSYSCALL	initialise_monitor_handles (void);
++ 
++ static int	wrap		(int);
++ static int	error		(int);
++diff -durN newlib-3.0.0.20180831.orig/newlib/libc/sys/arm/trap.S newlib-3.0.0.20180831/newlib/libc/sys/arm/trap.S
++--- newlib-3.0.0.20180831.orig/newlib/libc/sys/arm/trap.S	2018-09-01 03:40:42.000000000 +0800
+++++ newlib-3.0.0.20180831/newlib/libc/sys/arm/trap.S	2019-03-13 14:00:21.467704800 +0800
++@@ -85,7 +85,14 @@
++         @        protects the data against any events that may try and use
++         @        the stack.
++ 
+++#if defined(__ARM_ARCH_6M__) || defined(__ARM_ARCH_8M_BASE__)
+++		mov		r2, sp
+++		mov		r3, ip
+++		SUB		r3, r2, r3
+++		mov		ip, r3
+++#else
++         SUB     ip, sp, ip      @ extra stack required for function
+++#endif
++         @ Add stack extension code here.  If desired a new stack chunk
++         @ can be allocated, and the register state updated suitably.
++ 
+diff --git a/packages/newlib/3.1.0.20181231/0010-port-for-cortex-m4.patch b/packages/newlib/3.1.0.20181231/0010-port-for-cortex-m4.patch
+new file mode 100644
+index 00000000..19e99de7
+--- /dev/null
++++ b/packages/newlib/3.1.0.20181231/0010-port-for-cortex-m4.patch
+@@ -0,0 +1,168 @@
++diff -durN newlib-3.1.0.20181231.orig/libgloss/arm/_kill.c newlib-3.1.0.20181231/libgloss/arm/_kill.c
++--- newlib-3.1.0.20181231.orig/libgloss/arm/_kill.c	2019-01-01 12:40:11.000000000 +0800
+++++ newlib-3.1.0.20181231/libgloss/arm/_kill.c	2019-03-13 13:12:18.733859600 +0800
++@@ -5,7 +5,9 @@
++ int _kill_shared (int, int, int) __attribute__((__noreturn__));
++ int _kill (int, int);
++ 
++-int
+++#define DEFAULTSYSCALL __attribute__((weak))
+++
+++int DEFAULTSYSCALL
++ _kill (int pid, int sig)
++ {
++   if (sig == SIGABRT)
++diff -durN newlib-3.1.0.20181231.orig/libgloss/arm/syscalls.c newlib-3.1.0.20181231/libgloss/arm/syscalls.c
++--- newlib-3.1.0.20181231.orig/libgloss/arm/syscalls.c	2019-01-01 12:40:11.000000000 +0800
+++++ newlib-3.1.0.20181231/libgloss/arm/syscalls.c	2019-03-13 13:14:26.374350200 +0800
++@@ -17,31 +17,33 @@
++ #include <sys/wait.h>
++ #include "swi.h"
++ 
+++#define DEFAULTSYSCALL __attribute__((weak))
+++
++ /* Forward prototypes.  */
++-int     _system     (const char *);
++-int     _rename     (const char *, const char *);
++-int     _isatty		(int);
++-clock_t _times		(struct tms *);
++-int     _gettimeofday	(struct timeval *, void *);
++-int     _unlink		(const char *);
++-int     _link 		(const char *, const char *);
++-int     _stat 		(const char *, struct stat *);
++-int     _fstat 		(int, struct stat *);
++-int	_swistat	(int fd, struct stat * st);
++-void *  _sbrk		(ptrdiff_t);
++-pid_t   _getpid	        (void);
++-int     _close		(int);
++-clock_t _clock		(void);
++-int     _swiclose	(int);
++-int     _open		(const char *, int, ...);
++-int     _swiopen	(const char *, int);
++-int     _write 		(int, const void *, size_t);
++-int     _swiwrite	(int, const void *, size_t);
++-_off_t  _lseek		(int, _off_t, int);
++-_off_t  _swilseek	(int, _off_t, int);
++-int     _read		(int, void *, size_t);
++-int     _swiread	(int, void *, size_t);
++-void    initialise_monitor_handles (void);
+++int     DEFAULTSYSCALL	_system     (const char *);
+++int     DEFAULTSYSCALL	_rename     (const char *, const char *);
+++int     DEFAULTSYSCALL	_isatty		(int);
+++clock_t DEFAULTSYSCALL	_times		(struct tms *);
+++int     DEFAULTSYSCALL	_gettimeofday	(struct timeval *, void *);
+++int     DEFAULTSYSCALL	_unlink		(const char *);
+++int     DEFAULTSYSCALL	_link 		(const char *, const char *);
+++int     DEFAULTSYSCALL	_stat 		(const char *, struct stat *);
+++int     DEFAULTSYSCALL	_fstat 		(int, struct stat *);
+++int	DEFAULTSYSCALL	_swistat	(int fd, struct stat * st);
+++void *  DEFAULTSYSCALL	_sbrk		(ptrdiff_t);
+++pid_t   DEFAULTSYSCALL	_getpid	        (void);
+++int     DEFAULTSYSCALL	_close		(int);
+++clock_t DEFAULTSYSCALL	_clock		(void);
+++int     DEFAULTSYSCALL	_swiclose	(int);
+++int     DEFAULTSYSCALL	_open		(const char *, int, ...);
+++int     DEFAULTSYSCALL	_swiopen	(const char *, int);
+++int     DEFAULTSYSCALL	_write 		(int, const void *, size_t);
+++int     DEFAULTSYSCALL	_swiwrite	(int, const void *, size_t);
+++_off_t  DEFAULTSYSCALL	_lseek		(int, _off_t, int);
+++_off_t  DEFAULTSYSCALL	_swilseek	(int, _off_t, int);
+++int     DEFAULTSYSCALL	_read		(int, void *, size_t);
+++int     DEFAULTSYSCALL	_swiread	(int, void *, size_t);
+++void    DEFAULTSYSCALL	initialise_monitor_handles (void);
++ 
++ static int	checkerror	(int);
++ static int	error		(int);
++diff -durN newlib-3.1.0.20181231.orig/newlib/libc/sys/arm/crt0.S newlib-3.1.0.20181231/newlib/libc/sys/arm/crt0.S
++--- newlib-3.1.0.20181231.orig/newlib/libc/sys/arm/crt0.S	2019-01-01 12:40:11.000000000 +0800
+++++ newlib-3.1.0.20181231/newlib/libc/sys/arm/crt0.S	2019-03-13 13:15:47.717706900 +0800
++@@ -137,7 +137,7 @@
++ 	beq	.LC27
++ 
++ 	/*  Allow slop for stack overflow handling and small frames.  */
++-#ifdef __ARM_ARCH_6M__
+++#if defined(__ARM_ARCH_6M__) || defined(__ARM_ARCH_8M_BASE__)
++ 	adds	r2, #128
++ 	adds	r2, #128
++ 	mov	sl, r2
++diff -durN newlib-3.1.0.20181231.orig/newlib/libc/sys/arm/syscalls.c newlib-3.1.0.20181231/newlib/libc/sys/arm/syscalls.c
++--- newlib-3.1.0.20181231.orig/newlib/libc/sys/arm/syscalls.c	2019-01-01 12:40:11.000000000 +0800
+++++ newlib-3.1.0.20181231/newlib/libc/sys/arm/syscalls.c	2019-03-13 13:18:06.390276800 +0800
++@@ -17,32 +17,34 @@
++ #include <sys/wait.h>
++ #include "swi.h"
++ 
+++#define DEFAULTSYSCALL __attribute__((weak))
+++
++ /* Forward prototypes.  */
++-int	_system		(const char *);
++-int	_rename		(const char *, const char *);
++-int	_isatty		(int);
++-clock_t _times		(struct tms *);
++-int	_gettimeofday	(struct timeval *, void *);
++-void	_raise		(void);
++-int	_unlink		(const char *);
++-int	_link		(const char *, const char *);
++-int	_stat		(const char *, struct stat *);
++-int	_fstat		(int, struct stat *);
++-void *	_sbrk		(ptrdiff_t);
++-pid_t	_getpid		(void);
++-int	_kill		(int, int);
++-void	_exit		(int);
++-int	_close		(int);
++-int	_swiclose	(int);
++-int	_open		(const char *, int, ...);
++-int	_swiopen	(const char *, int);
++-int	_write		(int, const void *, size_t);
++-int	_swiwrite	(int, const void *, size_t);
++-_off_t	_lseek		(int, _off_t, int);
++-_off_t	_swilseek	(int, _off_t, int);
++-int	_read		(int, void *, size_t);
++-int	_swiread	(int, void *, size_t);
++-void	initialise_monitor_handles (void);
+++int	DEFAULTSYSCALL	_system		(const char *);
+++int	DEFAULTSYSCALL	_rename		(const char *, const char *);
+++int	DEFAULTSYSCALL	_isatty		(int);
+++clock_t DEFAULTSYSCALL	_times		(struct tms *);
+++int	DEFAULTSYSCALL	_gettimeofday	(struct timeval *, void *);
+++void	DEFAULTSYSCALL	_raise		(void);
+++int	DEFAULTSYSCALL	_unlink		(const char *);
+++int	DEFAULTSYSCALL	_link		(const char *, const char *);
+++int	DEFAULTSYSCALL	_stat		(const char *, struct stat *);
+++int	DEFAULTSYSCALL	_fstat		(int, struct stat *);
+++void *	DEFAULTSYSCALL	_sbrk		(ptrdiff_t);
+++pid_t	DEFAULTSYSCALL	_getpid		(void);
+++int	DEFAULTSYSCALL	_kill		(int, int);
+++void	DEFAULTSYSCALL	_exit		(int);
+++int	DEFAULTSYSCALL	_close		(int);
+++int	DEFAULTSYSCALL	_swiclose	(int);
+++int	DEFAULTSYSCALL	_open		(const char *, int, ...);
+++int	DEFAULTSYSCALL	_swiopen	(const char *, int);
+++int	DEFAULTSYSCALL	_write		(int, const void *, size_t);
+++int	DEFAULTSYSCALL	_swiwrite	(int, const void *, size_t);
+++_off_t	DEFAULTSYSCALL	_lseek		(int, _off_t, int);
+++_off_t	DEFAULTSYSCALL	_swilseek	(int, _off_t, int);
+++int	DEFAULTSYSCALL	_read		(int, void *, size_t);
+++int	DEFAULTSYSCALL	_swiread	(int, void *, size_t);
+++void	DEFAULTSYSCALL	initialise_monitor_handles (void);
++ 
++ static int	wrap		(int);
++ static int	error		(int);
++diff -durN newlib-3.1.0.20181231.orig/newlib/libc/sys/arm/trap.S newlib-3.1.0.20181231/newlib/libc/sys/arm/trap.S
++--- newlib-3.1.0.20181231.orig/newlib/libc/sys/arm/trap.S	2019-01-01 12:40:11.000000000 +0800
+++++ newlib-3.1.0.20181231/newlib/libc/sys/arm/trap.S	2019-03-13 13:19:22.014894000 +0800
++@@ -85,7 +85,14 @@
++         @        protects the data against any events that may try and use
++         @        the stack.
++ 
+++#if defined(__ARM_ARCH_6M__) || defined(__ARM_ARCH_8M_BASE__)
+++		mov		r2, sp
+++		mov		r3, ip
+++		SUB		r3, r2, r3
+++		mov		ip, r3
+++#else
++         SUB     ip, sp, ip      @ extra stack required for function
+++#endif
++         @ Add stack extension code here.  If desired a new stack chunk
++         @ can be allocated, and the register state updated suitably.
++ 
+diff --git a/packages/newlib/3.2.0/0010-port-for-cortex-m4.patch b/packages/newlib/3.2.0/0010-port-for-cortex-m4.patch
+new file mode 100644
+index 00000000..4c431962
+--- /dev/null
++++ b/packages/newlib/3.2.0/0010-port-for-cortex-m4.patch
+@@ -0,0 +1,138 @@
++diff -durN newlib-3.2.0.orig/libgloss/arm/_kill.c newlib-3.2.0/libgloss/arm/_kill.c
++--- newlib-3.2.0.orig/libgloss/arm/_kill.c	2020-01-03 03:56:24.000000000 +0800
+++++ newlib-3.2.0/libgloss/arm/_kill.c	2021-01-25 10:25:02.132466700 +0800
++@@ -5,7 +5,9 @@
++ int _kill_shared (int, int, int) __attribute__((__noreturn__));
++ int _kill (int, int);
++ 
++-int
+++#define DEFAULTSYSCALL __attribute__((weak))
+++
+++int DEFAULTSYSCALL
++ _kill (int pid, int sig)
++ {
++   if (sig == SIGABRT)
++diff -durN newlib-3.2.0.orig/libgloss/arm/syscalls.c newlib-3.2.0/libgloss/arm/syscalls.c
++--- newlib-3.2.0.orig/libgloss/arm/syscalls.c	2020-01-03 03:56:24.000000000 +0800
+++++ newlib-3.2.0/libgloss/arm/syscalls.c	2021-01-25 10:27:11.831405900 +0800
++@@ -17,31 +17,33 @@
++ #include <sys/wait.h>
++ #include "swi.h"
++ 
+++#define DEFAULTSYSCALL __attribute__((weak))
+++
++ /* Forward prototypes.  */
++-int	_system		(const char *);
++-int	_rename		(const char *, const char *);
++-int	_isatty		(int);
++-clock_t _times		(struct tms *);
++-int	_gettimeofday	(struct timeval *, void *);
++-int	_unlink		(const char *);
++-int	_link		(const char *, const char *);
++-int	_stat		(const char *, struct stat *);
++-int	_fstat		(int, struct stat *);
++-int	_swistat	(int fd, struct stat * st);
++-void *	_sbrk		(ptrdiff_t);
++-pid_t	_getpid		(void);
++-int	_close		(int);
++-clock_t	_clock		(void);
++-int	_swiclose	(int);
++-int	_open		(const char *, int, ...);
++-int	_swiopen	(const char *, int);
++-int	_write		(int, const void *, size_t);
++-int	_swiwrite	(int, const void *, size_t);
++-_off_t	_lseek		(int, _off_t, int);
++-_off_t	_swilseek	(int, _off_t, int);
++-int	_read		(int, void *, size_t);
++-int	_swiread	(int, void *, size_t);
++-void	initialise_monitor_handles (void);
+++int	DEFAULTSYSCALL _system		(const char *);
+++int	DEFAULTSYSCALL _rename		(const char *, const char *);
+++int	DEFAULTSYSCALL _isatty		(int);
+++clock_t DEFAULTSYSCALL _times		(struct tms *);
+++int	DEFAULTSYSCALL _gettimeofday	(struct timeval *, void *);
+++int	DEFAULTSYSCALL _unlink		(const char *);
+++int	DEFAULTSYSCALL _link		(const char *, const char *);
+++int	DEFAULTSYSCALL _stat		(const char *, struct stat *);
+++int	DEFAULTSYSCALL _fstat		(int, struct stat *);
+++int	DEFAULTSYSCALL _swistat	(int fd, struct stat * st);
+++void *	DEFAULTSYSCALL _sbrk		(ptrdiff_t);
+++pid_t	DEFAULTSYSCALL _getpid		(void);
+++int	DEFAULTSYSCALL _close		(int);
+++clock_t	DEFAULTSYSCALL _clock		(void);
+++int	DEFAULTSYSCALL _swiclose	(int);
+++int	DEFAULTSYSCALL _open		(const char *, int, ...);
+++int	DEFAULTSYSCALL _swiopen	(const char *, int);
+++int	DEFAULTSYSCALL _write		(int, const void *, size_t);
+++int	DEFAULTSYSCALL _swiwrite	(int, const void *, size_t);
+++_off_t	DEFAULTSYSCALL _lseek		(int, _off_t, int);
+++_off_t	DEFAULTSYSCALL _swilseek	(int, _off_t, int);
+++int	DEFAULTSYSCALL _read		(int, void *, size_t);
+++int	DEFAULTSYSCALL _swiread	(int, void *, size_t);
+++void	DEFAULTSYSCALL initialise_monitor_handles (void);
++ 
++ static int	checkerror	(int);
++ static int	error		(int);
++diff -durN newlib-3.2.0.orig/newlib/libc/sys/arm/syscalls.c newlib-3.2.0/newlib/libc/sys/arm/syscalls.c
++--- newlib-3.2.0.orig/newlib/libc/sys/arm/syscalls.c	2020-01-03 03:56:24.000000000 +0800
+++++ newlib-3.2.0/newlib/libc/sys/arm/syscalls.c	2021-01-25 10:46:11.819368700 +0800
++@@ -17,32 +17,34 @@
++ #include <sys/wait.h>
++ #include "swi.h"
++ 
+++#define DEFAULTSYSCALL __attribute__((weak))
+++
++ /* Forward prototypes.  */
++-int	_system		(const char *);
++-int	_rename		(const char *, const char *);
++-int	_isatty		(int);
++-clock_t _times		(struct tms *);
++-int	_gettimeofday	(struct timeval *, void *);
++-void	_raise		(void);
++-int	_unlink		(const char *);
++-int	_link		(const char *, const char *);
++-int	_stat		(const char *, struct stat *);
++-int	_fstat		(int, struct stat *);
++-void *	_sbrk		(ptrdiff_t);
++-pid_t	_getpid		(void);
++-int	_kill		(int, int);
++-void	_exit		(int);
++-int	_close		(int);
++-int	_swiclose	(int);
++-int	_open		(const char *, int, ...);
++-int	_swiopen	(const char *, int);
++-int	_write		(int, const void *, size_t);
++-int	_swiwrite	(int, const void *, size_t);
++-_off_t	_lseek		(int, _off_t, int);
++-_off_t	_swilseek	(int, _off_t, int);
++-int	_read		(int, void *, size_t);
++-int	_swiread	(int, void *, size_t);
++-void	initialise_monitor_handles (void);
+++int	DEFAULTSYSCALL _system		(const char *);
+++int	DEFAULTSYSCALL _rename		(const char *, const char *);
+++int	DEFAULTSYSCALL _isatty		(int);
+++clock_t DEFAULTSYSCALL _times		(struct tms *);
+++int	DEFAULTSYSCALL _gettimeofday	(struct timeval *, void *);
+++void	DEFAULTSYSCALL _raise		(void);
+++int	DEFAULTSYSCALL _unlink		(const char *);
+++int	DEFAULTSYSCALL _link		(const char *, const char *);
+++int	DEFAULTSYSCALL _stat		(const char *, struct stat *);
+++int	DEFAULTSYSCALL _fstat		(int, struct stat *);
+++void *	DEFAULTSYSCALL _sbrk		(ptrdiff_t);
+++pid_t	DEFAULTSYSCALL _getpid		(void);
+++int	DEFAULTSYSCALL _kill		(int, int);
+++void	DEFAULTSYSCALL _exit		(int);
+++int	DEFAULTSYSCALL _close		(int);
+++int	DEFAULTSYSCALL _swiclose	(int);
+++int	DEFAULTSYSCALL _open		(const char *, int, ...);
+++int	DEFAULTSYSCALL _swiopen	(const char *, int);
+++int	DEFAULTSYSCALL  _write		(int, const void *, size_t);
+++int	DEFAULTSYSCALL _swiwrite	(int, const void *, size_t);
+++_off_t	DEFAULTSYSCALL _lseek		(int, _off_t, int);
+++_off_t	DEFAULTSYSCALL _swilseek	(int, _off_t, int);
+++int	DEFAULTSYSCALL _read		(int, void *, size_t);
+++int	DEFAULTSYSCALL _swiread	(int, void *, size_t);
+++void	DEFAULTSYSCALL initialise_monitor_handles (void);
++ 
++ static int	wrap		(int);
++ static int	error		(int);
+diff --git a/packages/newlib/3.3.0/0010-port-for-cortex-m4.patch b/packages/newlib/3.3.0/0010-port-for-cortex-m4.patch
+new file mode 100644
+index 00000000..13fffb68
+--- /dev/null
++++ b/packages/newlib/3.3.0/0010-port-for-cortex-m4.patch
+@@ -0,0 +1,138 @@
++diff -durN newlib-3.3.0.orig/libgloss/arm/_kill.c newlib-3.3.0/libgloss/arm/_kill.c
++--- newlib-3.3.0.orig/libgloss/arm/_kill.c	2020-01-22 18:05:51.000000000 +0800
+++++ newlib-3.3.0/libgloss/arm/_kill.c	2021-01-25 10:56:57.170013200 +0800
++@@ -5,7 +5,9 @@
++ int _kill_shared (int, int, int) __attribute__((__noreturn__));
++ int _kill (int, int);
++ 
++-int
+++#define DEFAULTSYSCALL __attribute__((weak))
+++
+++int DEFAULTSYSCALL
++ _kill (int pid, int sig)
++ {
++   if (sig == SIGABRT)
++diff -durN newlib-3.3.0.orig/libgloss/arm/syscalls.c newlib-3.3.0/libgloss/arm/syscalls.c
++--- newlib-3.3.0.orig/libgloss/arm/syscalls.c	2020-01-22 18:05:51.000000000 +0800
+++++ newlib-3.3.0/libgloss/arm/syscalls.c	2021-01-25 10:56:57.184954400 +0800
++@@ -17,31 +17,33 @@
++ #include <sys/wait.h>
++ #include "swi.h"
++ 
+++#define DEFAULTSYSCALL __attribute__((weak))
+++
++ /* Forward prototypes.  */
++-int	_system		(const char *);
++-int	_rename		(const char *, const char *);
++-int	_isatty		(int);
++-clock_t _times		(struct tms *);
++-int	_gettimeofday	(struct timeval *, void *);
++-int	_unlink		(const char *);
++-int	_link		(const char *, const char *);
++-int	_stat		(const char *, struct stat *);
++-int	_fstat		(int, struct stat *);
++-int	_swistat	(int fd, struct stat * st);
++-void *	_sbrk		(ptrdiff_t);
++-pid_t	_getpid		(void);
++-int	_close		(int);
++-clock_t	_clock		(void);
++-int	_swiclose	(int);
++-int	_open		(const char *, int, ...);
++-int	_swiopen	(const char *, int);
++-int	_write		(int, const void *, size_t);
++-int	_swiwrite	(int, const void *, size_t);
++-_off_t	_lseek		(int, _off_t, int);
++-_off_t	_swilseek	(int, _off_t, int);
++-int	_read		(int, void *, size_t);
++-int	_swiread	(int, void *, size_t);
++-void	initialise_monitor_handles (void);
+++int	DEFAULTSYSCALL _system		(const char *);
+++int	DEFAULTSYSCALL _rename		(const char *, const char *);
+++int	DEFAULTSYSCALL _isatty		(int);
+++clock_t DEFAULTSYSCALL _times		(struct tms *);
+++int	DEFAULTSYSCALL _gettimeofday	(struct timeval *, void *);
+++int	DEFAULTSYSCALL _unlink		(const char *);
+++int	DEFAULTSYSCALL _link		(const char *, const char *);
+++int	DEFAULTSYSCALL _stat		(const char *, struct stat *);
+++int	DEFAULTSYSCALL _fstat		(int, struct stat *);
+++int	DEFAULTSYSCALL _swistat	(int fd, struct stat * st);
+++void *	DEFAULTSYSCALL _sbrk		(ptrdiff_t);
+++pid_t	DEFAULTSYSCALL _getpid		(void);
+++int	DEFAULTSYSCALL _close		(int);
+++clock_t	DEFAULTSYSCALL _clock		(void);
+++int	DEFAULTSYSCALL _swiclose	(int);
+++int	DEFAULTSYSCALL _open		(const char *, int, ...);
+++int	DEFAULTSYSCALL _swiopen	(const char *, int);
+++int	DEFAULTSYSCALL _write		(int, const void *, size_t);
+++int	DEFAULTSYSCALL _swiwrite	(int, const void *, size_t);
+++_off_t	DEFAULTSYSCALL _lseek		(int, _off_t, int);
+++_off_t	DEFAULTSYSCALL _swilseek	(int, _off_t, int);
+++int	DEFAULTSYSCALL _read		(int, void *, size_t);
+++int	DEFAULTSYSCALL _swiread	(int, void *, size_t);
+++void	DEFAULTSYSCALL initialise_monitor_handles (void);
++ 
++ static int	checkerror	(int);
++ static int	error		(int);
++diff -durN newlib-3.3.0.orig/newlib/libc/sys/arm/syscalls.c newlib-3.3.0/newlib/libc/sys/arm/syscalls.c
++--- newlib-3.3.0.orig/newlib/libc/sys/arm/syscalls.c	2020-01-22 18:05:51.000000000 +0800
+++++ newlib-3.3.0/newlib/libc/sys/arm/syscalls.c	2021-01-25 10:56:57.194959400 +0800
++@@ -17,32 +17,34 @@
++ #include <sys/wait.h>
++ #include "swi.h"
++ 
+++#define DEFAULTSYSCALL __attribute__((weak))
+++
++ /* Forward prototypes.  */
++-int	_system		(const char *);
++-int	_rename		(const char *, const char *);
++-int	_isatty		(int);
++-clock_t _times		(struct tms *);
++-int	_gettimeofday	(struct timeval *, void *);
++-void	_raise		(void);
++-int	_unlink		(const char *);
++-int	_link		(const char *, const char *);
++-int	_stat		(const char *, struct stat *);
++-int	_fstat		(int, struct stat *);
++-void *	_sbrk		(ptrdiff_t);
++-pid_t	_getpid		(void);
++-int	_kill		(int, int);
++-void	_exit		(int);
++-int	_close		(int);
++-int	_swiclose	(int);
++-int	_open		(const char *, int, ...);
++-int	_swiopen	(const char *, int);
++-int	_write		(int, const void *, size_t);
++-int	_swiwrite	(int, const void *, size_t);
++-_off_t	_lseek		(int, _off_t, int);
++-_off_t	_swilseek	(int, _off_t, int);
++-int	_read		(int, void *, size_t);
++-int	_swiread	(int, void *, size_t);
++-void	initialise_monitor_handles (void);
+++int	DEFAULTSYSCALL _system		(const char *);
+++int	DEFAULTSYSCALL _rename		(const char *, const char *);
+++int	DEFAULTSYSCALL _isatty		(int);
+++clock_t DEFAULTSYSCALL _times		(struct tms *);
+++int	DEFAULTSYSCALL _gettimeofday	(struct timeval *, void *);
+++void	DEFAULTSYSCALL _raise		(void);
+++int	DEFAULTSYSCALL _unlink		(const char *);
+++int	DEFAULTSYSCALL _link		(const char *, const char *);
+++int	DEFAULTSYSCALL _stat		(const char *, struct stat *);
+++int	DEFAULTSYSCALL _fstat		(int, struct stat *);
+++void *	DEFAULTSYSCALL _sbrk		(ptrdiff_t);
+++pid_t	DEFAULTSYSCALL _getpid		(void);
+++int	DEFAULTSYSCALL _kill		(int, int);
+++void	DEFAULTSYSCALL _exit		(int);
+++int	DEFAULTSYSCALL _close		(int);
+++int	DEFAULTSYSCALL _swiclose	(int);
+++int	DEFAULTSYSCALL _open		(const char *, int, ...);
+++int	DEFAULTSYSCALL _swiopen	(const char *, int);
+++int	DEFAULTSYSCALL  _write		(int, const void *, size_t);
+++int	DEFAULTSYSCALL _swiwrite	(int, const void *, size_t);
+++_off_t	DEFAULTSYSCALL _lseek		(int, _off_t, int);
+++_off_t	DEFAULTSYSCALL _swilseek	(int, _off_t, int);
+++int	DEFAULTSYSCALL _read		(int, void *, size_t);
+++int	DEFAULTSYSCALL _swiread	(int, void *, size_t);
+++void	DEFAULTSYSCALL initialise_monitor_handles (void);
++ 
++ static int	wrap		(int);
++ static int	error		(int);
+-- 
+2.30.0.windows.1
+

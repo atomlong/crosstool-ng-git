@@ -1,0 +1,1366 @@
+From 4b172647e0eaf3863208d099b877e3ed16aa163c Mon Sep 17 00:00:00 2001
+From: Atom Long <atom.long@hotmail.com>
+Date: Mon, 25 Jan 2021 11:25:57 +0800
+Subject: [PATCH] Add new gcc patches
+
+---
+ packages/gcc/10.3.0/0100-configure.patch      |  28 +++
+ .../gcc/10.3.0/0101-libgcc-configure.patch    |  12 ++
+ .../gcc/10.3.0/0102-libgcc-mkheader_sh.patch  |  15 ++
+ .../gcc/10.3.0/0103-port-for-cortex-m.patch   | 165 ++++++++++++++++++
+ packages/gcc/10.3.0/0104-gcc-configure.patch  |  12 ++
+ packages/gcc/11.2.0/0100-configure.patch      |  28 +++
+ .../gcc/11.2.0/0101-libgcc-configure.patch    |  12 ++
+ .../gcc/11.2.0/0102-libgcc-mkheader_sh.patch  |  15 ++
+ .../gcc/11.2.0/0103-port-for-cortex-m.patch   | 165 ++++++++++++++++++
+ packages/gcc/11.2.0/0104-gcc-configure.patch  |  12 ++
+ packages/gcc/7.5.0/0100-configure.patch       |  28 +++
+ .../gcc/7.5.0/0101-libgcc-configure.patch     |  12 ++
+ .../gcc/7.5.0/0102-libgcc-mkheader_sh.patch   |  15 ++
+ .../gcc/7.5.0/0103-port-for-cortex-m.patch    | 160 +++++++++++++++++
+ packages/gcc/7.5.0/0104-gcc-configure.patch   |  12 ++
+ packages/gcc/8.5.0/0100-configure.patch       |  28 +++
+ .../gcc/8.5.0/0101-libgcc-configure.patch     |  12 ++
+ .../gcc/8.5.0/0102-libgcc-mkheader_sh.patch   |  15 ++
+ .../gcc/8.5.0/0103-port-for-cortex-m.patch    | 165 ++++++++++++++++++
+ packages/gcc/8.5.0/0104-gcc-configure.patch   |  12 ++
+ packages/gcc/9.4.0/0100-configure.patch       |  28 +++
+ .../gcc/9.4.0/0101-libgcc-configure.patch     |  12 ++
+ .../gcc/9.4.0/0102-libgcc-mkheader_sh.patch   |  15 ++
+ .../gcc/9.4.0/0103-port-for-cortex-m.patch    | 165 ++++++++++++++++++
+ packages/gcc/9.4.0/0104-gcc-configure.patch   |  12 ++
+ 25 files changed, 1155 insertions(+)
+ create mode 100644 packages/gcc/10.3.0/0100-configure.patch
+ create mode 100644 packages/gcc/10.3.0/0101-libgcc-configure.patch
+ create mode 100644 packages/gcc/10.3.0/0102-libgcc-mkheader_sh.patch
+ create mode 100644 packages/gcc/10.3.0/0103-port-for-cortex-m.patch
+ create mode 100644 packages/gcc/10.3.0/0104-gcc-configure.patch
+ create mode 100644 packages/gcc/11.2.0/0100-configure.patch
+ create mode 100644 packages/gcc/11.2.0/0101-libgcc-configure.patch
+ create mode 100644 packages/gcc/11.2.0/0102-libgcc-mkheader_sh.patch
+ create mode 100644 packages/gcc/11.2.0/0103-port-for-cortex-m.patch
+ create mode 100644 packages/gcc/11.2.0/0104-gcc-configure.patch
+ create mode 100644 packages/gcc/7.5.0/0100-configure.patch
+ create mode 100644 packages/gcc/7.5.0/0101-libgcc-configure.patch
+ create mode 100644 packages/gcc/7.5.0/0102-libgcc-mkheader_sh.patch
+ create mode 100644 packages/gcc/7.5.0/0103-port-for-cortex-m.patch
+ create mode 100644 packages/gcc/7.5.0/0104-gcc-configure.patch
+ create mode 100644 packages/gcc/8.5.0/0100-configure.patch
+ create mode 100644 packages/gcc/8.5.0/0101-libgcc-configure.patch
+ create mode 100644 packages/gcc/8.5.0/0102-libgcc-mkheader_sh.patch
+ create mode 100644 packages/gcc/8.5.0/0103-port-for-cortex-m.patch
+ create mode 100644 packages/gcc/8.5.0/0104-gcc-configure.patch
+ create mode 100644 packages/gcc/9.4.0/0100-configure.patch
+ create mode 100644 packages/gcc/9.4.0/0101-libgcc-configure.patch
+ create mode 100644 packages/gcc/9.4.0/0102-libgcc-mkheader_sh.patch
+ create mode 100644 packages/gcc/9.4.0/0103-port-for-cortex-m.patch
+ create mode 100644 packages/gcc/9.4.0/0104-gcc-configure.patch
+
+diff --git a/packages/gcc/10.3.0/0100-configure.patch b/packages/gcc/10.3.0/0100-configure.patch
+new file mode 100644
+index 00000000..15481eae
+--- /dev/null
++++ b/packages/gcc/10.3.0/0100-configure.patch
+@@ -0,0 +1,28 @@
++diff -durN gcc-10.2.0.orig/configure gcc-10.2.0/configure
++--- gcc-10.2.0.orig/configure	2020-07-23 14:35:16.916379800 +0800
+++++ gcc-10.2.0/configure	2021-01-24 21:32:11.683053500 +0800
++@@ -1422,6 +1422,8 @@
++   eval ac_cv_env_${ac_var}_value=\$${ac_var}
++ done
++ 
+++[[ "$(uname)" == MINGW* && -n "${srcdir}" ]] && srcdir="$(cygpath -m ${srcdir})"
+++
++ #
++ # Report the --help message.
++ #
++@@ -7829,6 +7831,15 @@
++     ;;
++ esac
++ 
+++# Check whether --with-local-prefix was given.
+++if test "${with_local_prefix+set}" = set; then :
+++  withval=$with_local_prefix;
+++  if [ "$withval" != "" ] && [ -d "$withval/include" ] &&
+++	! (grep -qP "\-isystem\s+$withval/include" <<< ${FLAGS_FOR_TARGET}); then
+++     FLAGS_FOR_TARGET=$FLAGS_FOR_TARGET" -isystem $withval/include"
+++  fi
+++fi
+++
++ # Makefile fragments.
++ for frag in host_makefile_frag target_makefile_frag alphaieee_frag ospace_frag;
++ do
+diff --git a/packages/gcc/10.3.0/0101-libgcc-configure.patch b/packages/gcc/10.3.0/0101-libgcc-configure.patch
+new file mode 100644
+index 00000000..0bd8b7b6
+--- /dev/null
++++ b/packages/gcc/10.3.0/0101-libgcc-configure.patch
+@@ -0,0 +1,12 @@
++diff -durN gcc-10.2.0.orig/libgcc/configure gcc-10.2.0/libgcc/configure
++--- gcc-10.2.0.orig/libgcc/configure	2020-07-23 14:35:18.800400500 +0800
+++++ gcc-10.2.0/libgcc/configure	2021-01-24 21:35:40.348673200 +0800
++@@ -1261,6 +1261,8 @@
++   eval ac_cv_env_${ac_var}_value=\$${ac_var}
++ done
++ 
+++[[ "$(uname)" == MINGW* && -n "${srcdir}" ]] && srcdir="$(cygpath -m ${srcdir})"
+++
++ #
++ # Report the --help message.
++ #
+diff --git a/packages/gcc/10.3.0/0102-libgcc-mkheader_sh.patch b/packages/gcc/10.3.0/0102-libgcc-mkheader_sh.patch
+new file mode 100644
+index 00000000..75670c3e
+--- /dev/null
++++ b/packages/gcc/10.3.0/0102-libgcc-mkheader_sh.patch
+@@ -0,0 +1,15 @@
++diff -durN gcc-10.2.0.orig/libgcc/mkheader.sh gcc-10.2.0/libgcc/mkheader.sh
++--- gcc-10.2.0.orig/libgcc/mkheader.sh	2020-07-23 14:35:18.800400500 +0800
+++++ gcc-10.2.0/libgcc/mkheader.sh	2021-01-24 21:48:05.948946300 +0800
++@@ -34,7 +34,11 @@
++ done
++ 
++ for file in $HEADERS; do
+++if [[ "$(uname)" == MINGW* ]]; then
+++	echo "#include \"$(cygpath -m $file)\""
+++else
++     echo "#include \"$file\""
+++fi
++ done
++ 
++ # Add multiple inclusion protection guard, part two.
+diff --git a/packages/gcc/10.3.0/0103-port-for-cortex-m.patch b/packages/gcc/10.3.0/0103-port-for-cortex-m.patch
+new file mode 100644
+index 00000000..525f814e
+--- /dev/null
++++ b/packages/gcc/10.3.0/0103-port-for-cortex-m.patch
+@@ -0,0 +1,165 @@
++diff -durN gcc-10.2.0.orig/gcc/config/arm/arm.c gcc-10.2.0/gcc/config/arm/arm.c
++--- gcc-10.2.0.orig/gcc/config/arm/arm.c	2020-07-23 14:35:17.344384500 +0800
+++++ gcc-10.2.0/gcc/config/arm/arm.c	2021-01-24 22:03:42.979148000 +0800
++@@ -3448,10 +3448,45 @@
++ 
++   if (!global_options_set.x_arm_fpu_index)
++     {
+++      const char *target_fpu_name;
++       bool ok;
++       int fpu_index;
++ 
++-      ok = opt_enum_arg_to_value (OPT_mfpu_, FPUTYPE_AUTO, &fpu_index,
+++#ifdef FPUTYPE_AUTO
+++      target_fpu_name = FPUTYPE_AUTO;
+++#else
+++      target_fpu_name = "auto";
+++#endif
+++
+++      if (global_options.x_arm_cpu_string == "cortex-m4" ||
+++		  global_options.x_arm_cpu_string == "cortex-m7")
+++	  {
+++      	target_fpu_name = "fpv4-sp-d16";
+++	  }
+++	  else if (global_options.x_arm_cpu_string == "cortex-r4" ||
+++			   global_options.x_arm_cpu_string == "cortex-r4f" ||
+++			   global_options.x_arm_cpu_string == "cortex-r5" ||
+++			   global_options.x_arm_cpu_string == "cortex-r7")
+++	  {
+++      	target_fpu_name = "vfpv3";
+++      }
+++	  else if (global_options.x_arm_cpu_string == "cortex-a5" ||
+++			   global_options.x_arm_cpu_string == "cortex-a7")
+++	  {
+++      	target_fpu_name = "vfpv4-d16";
+++	  }
+++	  else if (global_options.x_arm_cpu_string == "cortex-a8" ||
+++			   global_options.x_arm_cpu_string == "cortex-a9")
+++	  {
+++      	target_fpu_name = "vfpv3";
+++	  }
+++	  else if (global_options.x_arm_cpu_string == "cortex-a12" ||
+++			   global_options.x_arm_cpu_string == "cortex-a15")
+++	  {
+++      	target_fpu_name = "vfpv4";
+++	  }
+++
+++      ok = opt_enum_arg_to_value (OPT_mfpu_, target_fpu_name, &fpu_index,
++ 				  CL_TARGET);
++       gcc_assert (ok);
++       arm_fpu_index = (enum fpu_type) fpu_index;
++diff -durN gcc-10.2.0.orig/gcc/config/arm/t-arm-elf gcc-10.2.0/gcc/config/arm/t-arm-elf
++--- gcc-10.2.0.orig/gcc/config/arm/t-arm-elf	2020-07-23 14:35:17.356384600 +0800
+++++ gcc-10.2.0/gcc/config/arm/t-arm-elf	2021-01-24 22:03:42.999149500 +0800
++@@ -76,6 +76,10 @@
++ MULTILIB_OPTIONS     += mfloat-abi=hard
++ MULTILIB_DIRNAMES    += fpu
++ 
+++MULTILIB_OPTIONS += mcpu=cortex-a15/mcpu=cortex-a5/mcpu=cortex-a7/mcpu=cortex-a8/mcpu=cortex-a9/mcpu=cortex-m0/mcpu=cortex-m0plus/mcpu=cortex-m1/mcpu=cortex-m3/mcpu=cortex-m4/mcpu=cortex-m7/mcpu=cortex-r4/mcpu=cortex-r4f/mcpu=cortex-r5
+++MULTILIB_DIRNAMES += cortex_a15 cortex_a5 cortex_a7 cortex_a8 cortex_a9 cortex_m0 cortex_m0plus cortex_m1 cortex_m3 cortex_m4 cortex_m7 cortex_r4 cortex_r4f cortex_r5
+++#MULTILIB_EXCEPTIONS += 
+++
++ # Build a total of 4 library variants (base options plus the following):
++ MULTILIB_REQUIRED    += mthumb
++ MULTILIB_REQUIRED    += marm/mfpu=auto/march=armv5te+fp/mfloat-abi=hard
++diff -durN gcc-10.2.0.orig/gcc/genmultilib gcc-10.2.0/gcc/genmultilib
++--- gcc-10.2.0.orig/gcc/genmultilib	2020-07-23 14:35:17.632387700 +0800
+++++ gcc-10.2.0/gcc/genmultilib	2021-01-24 22:03:43.019150800 +0800
++@@ -140,6 +140,7 @@
++ multiarch=$9
++ multilib_reuse=${10}
++ enable_multilib=${11}
+++target_noncanonical=${12}
++ 
++ echo "static const char *const multilib_raw[] = {"
++ 
++@@ -240,6 +241,10 @@
++ 
++ fi
++ 
+++if [ -e ../$(dirname $0)/genmultilib_filter_${target_noncanonical} ]; then
+++   combinations=`perl ../$(dirname $0)/genmultilib_filter_${target_noncanonical} ${combinations}`
+++fi
+++
++ # Construct a sed pattern which will convert option names to directory
++ # names.
++ todirnames=
++diff -durN gcc-10.2.0.orig/gcc/genmultilib_filter_arm-eabi gcc-10.2.0/gcc/genmultilib_filter_arm-eabi
++--- gcc-10.2.0.orig/gcc/genmultilib_filter_arm-eabi	1970-01-01 08:00:00.000000000 +0800
+++++ gcc-10.2.0/gcc/genmultilib_filter_arm-eabi	2021-01-24 22:03:43.029150900 +0800
++@@ -0,0 +1,12 @@
+++#!/bin/perl
+++
+++foreach (@ARGV)
+++{
+++	next if (/\/mcpu=cortex-m/ && !/\/mthumb\//);
+++	next if (!/\/mcpu=cortex-/ && /\/mthumb\// && /\/mfloat-abi=hard\//);
+++	next if (/\/mcpu=cortex-m0/ && /\/mthumb\// && /\/mfloat-abi=hard\//);
+++	next if (/\/mcpu=cortex-m1/ && /\/mthumb\// && /\/mfloat-abi=hard\//);
+++	
+++	print;
+++	print " ";
+++}
++diff -durN gcc-10.2.0.orig/gcc/Makefile.in gcc-10.2.0/gcc/Makefile.in
++--- gcc-10.2.0.orig/gcc/Makefile.in	2020-07-23 14:35:17.032381100 +0800
+++++ gcc-10.2.0/gcc/Makefile.in	2021-01-24 22:03:43.049151900 +0800
++@@ -2116,6 +2116,7 @@
++ 	    "$(if $(MULTILIB_OSDIRNAMES),,$(MULTIARCH_DIRNAME))" \
++ 	    "$(MULTILIB_REUSE)" \
++ 	    "@enable_multilib@" \
+++		"$(target_noncanonical)" \
++ 	    > tmp-mlib.h; \
++ 	else \
++ 	  $(SHELL) $(srcdir)/genmultilib '' '' '' '' '' '' '' '' \
++diff -durN gcc-10.2.0.orig/libgcc/crtstuff.c gcc-10.2.0/libgcc/crtstuff.c
++--- gcc-10.2.0.orig/libgcc/crtstuff.c	2020-07-23 14:35:18.800400500 +0800
+++++ gcc-10.2.0/libgcc/crtstuff.c	2021-01-24 22:03:43.069152900 +0800
++@@ -51,6 +51,7 @@
++ /* FIXME: Including auto-host is incorrect, but until we have
++    identified the set of defines that need to go into auto-target.h,
++    this will have to do.  */
+++#define USED_FOR_TARGET
++ #include "auto-host.h"
++ #undef caddr_t
++ #undef pid_t
++diff -durN gcc-10.2.0.orig/libstdc++-v3/libsupc++/eh_terminate.cc gcc-10.2.0/libstdc++-v3/libsupc++/eh_terminate.cc
++--- gcc-10.2.0.orig/libstdc++-v3/libsupc++/eh_terminate.cc	2020-07-23 14:35:19.284405900 +0800
+++++ gcc-10.2.0/libstdc++-v3/libsupc++/eh_terminate.cc	2021-01-24 22:03:43.079153600 +0800
++@@ -52,7 +52,7 @@
++     { std::abort (); }
++ }
++ 
++-void
+++void __attribute__((weak))
++ std::terminate () throw()
++ {
++   __terminate (get_terminate ());
++@@ -65,7 +65,7 @@
++   std::terminate ();
++ }
++ 
++-void
+++void __attribute__((weak))
++ std::unexpected ()
++ {
++   __unexpected (get_unexpected ());
++diff -durN gcc-10.2.0.orig/libstdc++-v3/libsupc++/pure.cc gcc-10.2.0/libstdc++-v3/libsupc++/pure.cc
++--- gcc-10.2.0.orig/libstdc++-v3/libsupc++/pure.cc	2020-07-23 14:35:19.284405900 +0800
+++++ gcc-10.2.0/libstdc++-v3/libsupc++/pure.cc	2021-01-24 22:03:43.089154000 +0800
++@@ -43,14 +43,14 @@
++ # define writestr(str) /* Empty */
++ #endif
++ 
++-extern "C" void
+++extern "C" void __attribute__((weak))
++ __cxxabiv1::__cxa_pure_virtual (void)
++ {
++   writestr ("pure virtual method called\n");
++   std::terminate ();
++ }
++ 
++-extern "C" void
+++extern "C" void __attribute__((weak))
++ __cxxabiv1::__cxa_deleted_virtual (void)
++ {
++   writestr ("deleted virtual method called\n");
+diff --git a/packages/gcc/10.3.0/0104-gcc-configure.patch b/packages/gcc/10.3.0/0104-gcc-configure.patch
+new file mode 100644
+index 00000000..2506d903
+--- /dev/null
++++ b/packages/gcc/10.3.0/0104-gcc-configure.patch
+@@ -0,0 +1,12 @@
++diff -durN gcc-10.2.0.orig/gcc/configure gcc-10.2.0/gcc/configure
++--- gcc-10.2.0.orig/gcc/configure	2020-07-23 14:35:17.500386200 +0800
+++++ gcc-10.2.0/gcc/configure	2021-01-24 22:23:16.084658000 +0800
++@@ -1568,6 +1568,8 @@
++   eval ac_cv_env_${ac_var}_value=\$${ac_var}
++ done
++ 
+++[[ "$(uname)" == MINGW* && -n "${srcdir}" ]] && srcdir="$(cygpath -m ${srcdir})"
+++
++ #
++ # Report the --help message.
++ #
+diff --git a/packages/gcc/11.2.0/0100-configure.patch b/packages/gcc/11.2.0/0100-configure.patch
+new file mode 100644
+index 00000000..d25e197f
+--- /dev/null
++++ b/packages/gcc/11.2.0/0100-configure.patch
+@@ -0,0 +1,28 @@
++diff -durN gcc-11.2.0.orig/configure gcc-11.2.0/configure
++--- gcc-11.2.0.orig/configure	2021-07-28 14:55:06.628278100 +0800
+++++ gcc-11.2.0/configure	2021-08-02 20:13:23.180583200 +0800
++@@ -1424,6 +1424,8 @@
++   eval ac_cv_env_${ac_var}_value=\$${ac_var}
++ done
++ 
+++[[ "$(uname)" == MINGW* && -n "${srcdir}" ]] && srcdir="$(cygpath -m ${srcdir})"
+++
++ #
++ # Report the --help message.
++ #
++@@ -9835,6 +9837,15 @@
++     ;;
++ esac
++ 
+++# Check whether --with-local-prefix was given.
+++if test "${with_local_prefix+set}" = set; then :
+++  withval=$with_local_prefix;
+++  if [ "$withval" != "" ] && [ -d "$withval/include" ] &&
+++	! (grep -qP "\-isystem\s+$withval/include" <<< ${FLAGS_FOR_TARGET}); then
+++     FLAGS_FOR_TARGET=$FLAGS_FOR_TARGET" -isystem $withval/include"
+++  fi
+++fi
+++
++ # Makefile fragments.
++ for frag in host_makefile_frag target_makefile_frag alphaieee_frag ospace_frag;
++ do
+diff --git a/packages/gcc/11.2.0/0101-libgcc-configure.patch b/packages/gcc/11.2.0/0101-libgcc-configure.patch
+new file mode 100644
+index 00000000..b37cc0a2
+--- /dev/null
++++ b/packages/gcc/11.2.0/0101-libgcc-configure.patch
+@@ -0,0 +1,12 @@
++diff -durN gcc-11.2.0.orig/libgcc/configure gcc-11.2.0/libgcc/configure
++--- gcc-11.2.0.orig/libgcc/configure	2021-07-28 14:55:08.808308500 +0800
+++++ gcc-11.2.0/libgcc/configure	2021-08-02 20:21:53.461463700 +0800
++@@ -1261,6 +1261,8 @@
++   eval ac_cv_env_${ac_var}_value=\$${ac_var}
++ done
++ 
+++[[ "$(uname)" == MINGW* && -n "${srcdir}" ]] && srcdir="$(cygpath -m ${srcdir})"
+++
++ #
++ # Report the --help message.
++ #
+diff --git a/packages/gcc/11.2.0/0102-libgcc-mkheader_sh.patch b/packages/gcc/11.2.0/0102-libgcc-mkheader_sh.patch
+new file mode 100644
+index 00000000..9774ddda
+--- /dev/null
++++ b/packages/gcc/11.2.0/0102-libgcc-mkheader_sh.patch
+@@ -0,0 +1,15 @@
++diff -durN gcc-11.2.0.orig/libgcc/mkheader.sh gcc-11.2.0/libgcc/mkheader.sh
++--- gcc-11.2.0.orig/libgcc/mkheader.sh	2021-07-28 14:55:08.812308600 +0800
+++++ gcc-11.2.0/libgcc/mkheader.sh	2021-08-02 20:23:39.445555200 +0800
++@@ -34,7 +34,11 @@
++ done
++ 
++ for file in $HEADERS; do
+++if [[ "$(uname)" == MINGW* ]]; then
+++	echo "#include \"$(cygpath -m $file)\""
+++else
++     echo "#include \"$file\""
+++fi
++ done
++ 
++ # Add multiple inclusion protection guard, part two.
+diff --git a/packages/gcc/11.2.0/0103-port-for-cortex-m.patch b/packages/gcc/11.2.0/0103-port-for-cortex-m.patch
+new file mode 100644
+index 00000000..7b7d663d
+--- /dev/null
++++ b/packages/gcc/11.2.0/0103-port-for-cortex-m.patch
+@@ -0,0 +1,165 @@
++diff -durN gcc-11.2.0.orig/gcc/config/arm/arm.c gcc-11.2.0/gcc/config/arm/arm.c
++--- gcc-11.2.0.orig/gcc/config/arm/arm.c	2021-07-28 14:55:07.024283600 +0800
+++++ gcc-11.2.0/gcc/config/arm/arm.c	2021-08-02 20:35:25.817527600 +0800
++@@ -3464,10 +3464,45 @@
++ 
++   if (!global_options_set.x_arm_fpu_index)
++     {
+++	  const char *target_fpu_name;
++       bool ok;
++       int fpu_index;
++ 
++-      ok = opt_enum_arg_to_value (OPT_mfpu_, FPUTYPE_AUTO, &fpu_index,
+++#ifdef FPUTYPE_AUTO
+++      target_fpu_name = FPUTYPE_AUTO;
+++#else
+++      target_fpu_name = "auto";
+++#endif
+++
+++      if (global_options.x_arm_cpu_string == "cortex-m4" ||
+++		  global_options.x_arm_cpu_string == "cortex-m7")
+++	  {
+++      	target_fpu_name = "fpv4-sp-d16";
+++	  }
+++	  else if (global_options.x_arm_cpu_string == "cortex-r4" ||
+++			   global_options.x_arm_cpu_string == "cortex-r4f" ||
+++			   global_options.x_arm_cpu_string == "cortex-r5" ||
+++			   global_options.x_arm_cpu_string == "cortex-r7")
+++	  {
+++      	target_fpu_name = "vfpv3";
+++      }
+++	  else if (global_options.x_arm_cpu_string == "cortex-a5" ||
+++			   global_options.x_arm_cpu_string == "cortex-a7")
+++	  {
+++      	target_fpu_name = "vfpv4-d16";
+++	  }
+++	  else if (global_options.x_arm_cpu_string == "cortex-a8" ||
+++			   global_options.x_arm_cpu_string == "cortex-a9")
+++	  {
+++      	target_fpu_name = "vfpv3";
+++	  }
+++	  else if (global_options.x_arm_cpu_string == "cortex-a12" ||
+++			   global_options.x_arm_cpu_string == "cortex-a15")
+++	  {
+++      	target_fpu_name = "vfpv4";
+++	  }
+++
+++      ok = opt_enum_arg_to_value (OPT_mfpu_, target_fpu_name, &fpu_index,
++ 				  CL_TARGET);
++       gcc_assert (ok);
++       arm_fpu_index = (enum fpu_type) fpu_index;
++diff -durN gcc-11.2.0.orig/gcc/config/arm/t-arm-elf gcc-11.2.0/gcc/config/arm/t-arm-elf
++--- gcc-11.2.0.orig/gcc/config/arm/t-arm-elf	2021-07-28 14:55:07.036283800 +0800
+++++ gcc-11.2.0/gcc/config/arm/t-arm-elf	2021-08-02 20:36:34.821359000 +0800
++@@ -76,6 +76,10 @@
++ MULTILIB_OPTIONS     += mfloat-abi=hard
++ MULTILIB_DIRNAMES    += fpu
++ 
+++MULTILIB_OPTIONS += mcpu=cortex-a15/mcpu=cortex-a5/mcpu=cortex-a7/mcpu=cortex-a8/mcpu=cortex-a9/mcpu=cortex-m0/mcpu=cortex-m0plus/mcpu=cortex-m1/mcpu=cortex-m3/mcpu=cortex-m4/mcpu=cortex-m7/mcpu=cortex-r4/mcpu=cortex-r4f/mcpu=cortex-r5
+++MULTILIB_DIRNAMES += cortex_a15 cortex_a5 cortex_a7 cortex_a8 cortex_a9 cortex_m0 cortex_m0plus cortex_m1 cortex_m3 cortex_m4 cortex_m7 cortex_r4 cortex_r4f cortex_r5
+++#MULTILIB_EXCEPTIONS += 
+++
++ # Build a total of 4 library variants (base options plus the following):
++ MULTILIB_REQUIRED    += mthumb
++ MULTILIB_REQUIRED    += marm/mfpu=auto/march=armv5te+fp/mfloat-abi=hard
++diff -durN gcc-11.2.0.orig/gcc/genmultilib gcc-11.2.0/gcc/genmultilib
++--- gcc-11.2.0.orig/gcc/genmultilib	2021-07-28 14:55:07.304287500 +0800
+++++ gcc-11.2.0/gcc/genmultilib	2021-08-02 20:38:01.089774500 +0800
++@@ -140,6 +140,7 @@
++ multiarch=$9
++ multilib_reuse=${10}
++ enable_multilib=${11}
+++target_noncanonical=${12}
++ 
++ echo "static const char *const multilib_raw[] = {"
++ 
++@@ -240,6 +241,10 @@
++ 
++ fi
++ 
+++if [ -e ../$(dirname $0)/genmultilib_filter_${target_noncanonical} ]; then
+++   combinations=`perl ../$(dirname $0)/genmultilib_filter_${target_noncanonical} ${combinations}`
+++fi
+++
++ # Construct a sed pattern which will convert option names to directory
++ # names.
++ todirnames=
++diff -durN gcc-11.2.0.orig/gcc/genmultilib_filter_arm-eabi gcc-11.2.0/gcc/genmultilib_filter_arm-eabi
++--- gcc-11.2.0.orig/gcc/genmultilib_filter_arm-eabi	1970-01-01 08:00:00.000000000 +0800
+++++ gcc-11.2.0/gcc/genmultilib_filter_arm-eabi	2021-08-02 20:39:47.004644700 +0800
++@@ -0,0 +1,12 @@
+++#!/bin/perl
+++
+++foreach (@ARGV)
+++{
+++next if (/\/mcpu=cortex-m/ && !/\/mthumb\//);
+++next if (!/\/mcpu=cortex-/ && /\/mthumb\// && /\/mfloat-abi=hard\//);
+++next if (/\/mcpu=cortex-m0/ && /\/mthumb\// && /\/mfloat-abi=hard\//);
+++next if (/\/mcpu=cortex-m1/ && /\/mthumb\// && /\/mfloat-abi=hard\//);
+++
+++print;
+++print " ";
+++}
++diff -durN gcc-11.2.0.orig/gcc/Makefile.in gcc-11.2.0/gcc/Makefile.in
++--- gcc-11.2.0.orig/gcc/Makefile.in	2021-07-28 14:55:06.748279800 +0800
+++++ gcc-11.2.0/gcc/Makefile.in	2021-08-02 20:40:45.449790800 +0800
++@@ -2179,6 +2179,7 @@
++ 	    "$(if $(MULTILIB_OSDIRNAMES),,$(MULTIARCH_DIRNAME))" \
++ 	    "$(MULTILIB_REUSE)" \
++ 	    "@enable_multilib@" \
+++		"$(target_noncanonical)" \
++ 	    > tmp-mlib.h; \
++ 	else \
++ 	  $(SHELL) $(srcdir)/genmultilib '' '' '' '' '' '' '' '' \
++diff -durN gcc-11.2.0.orig/libgcc/crtstuff.c gcc-11.2.0/libgcc/crtstuff.c
++--- gcc-11.2.0.orig/libgcc/crtstuff.c	2021-07-28 14:55:08.808308500 +0800
+++++ gcc-11.2.0/libgcc/crtstuff.c	2021-08-02 20:46:28.836638700 +0800
++@@ -51,6 +51,7 @@
++ /* FIXME: Including auto-host is incorrect, but until we have
++    identified the set of defines that need to go into auto-target.h,
++    this will have to do.  */
+++#define USED_FOR_TARGET
++ #include "auto-host.h"
++ #undef caddr_t
++ #undef pid_t
++diff -durN gcc-11.2.0.orig/libstdc++-v3/libsupc++/eh_terminate.cc gcc-11.2.0/libstdc++-v3/libsupc++/eh_terminate.cc
++--- gcc-11.2.0.orig/libstdc++-v3/libsupc++/eh_terminate.cc	2021-07-28 14:55:09.332315800 +0800
+++++ gcc-11.2.0/libstdc++-v3/libsupc++/eh_terminate.cc	2021-08-02 20:48:13.483475800 +0800
++@@ -52,7 +52,7 @@
++     { std::abort (); }
++ }
++ 
++-void
+++void __attribute__((weak))
++ std::terminate () throw()
++ {
++   __terminate (get_terminate ());
++@@ -65,7 +65,7 @@
++   std::terminate ();
++ }
++ 
++-void
+++void __attribute__((weak))
++ std::unexpected ()
++ {
++   __unexpected (get_unexpected ());
++diff -durN gcc-11.2.0.orig/libstdc++-v3/libsupc++/pure.cc gcc-11.2.0/libstdc++-v3/libsupc++/pure.cc
++--- gcc-11.2.0.orig/libstdc++-v3/libsupc++/pure.cc	2021-07-28 14:55:09.332315800 +0800
+++++ gcc-11.2.0/libstdc++-v3/libsupc++/pure.cc	2021-08-02 20:49:21.309169500 +0800
++@@ -43,14 +43,14 @@
++ # define writestr(str) /* Empty */
++ #endif
++ 
++-extern "C" void
+++extern "C" void __attribute__((weak))
++ __cxxabiv1::__cxa_pure_virtual (void)
++ {
++   writestr ("pure virtual method called\n");
++   std::terminate ();
++ }
++ 
++-extern "C" void
+++extern "C" void __attribute__((weak))
++ __cxxabiv1::__cxa_deleted_virtual (void)
++ {
++   writestr ("deleted virtual method called\n");
+diff --git a/packages/gcc/11.2.0/0104-gcc-configure.patch b/packages/gcc/11.2.0/0104-gcc-configure.patch
+new file mode 100644
+index 00000000..5158d1b2
+--- /dev/null
++++ b/packages/gcc/11.2.0/0104-gcc-configure.patch
+@@ -0,0 +1,12 @@
++diff -durN gcc-11.2.0.orig/gcc/configure gcc-11.2.0/gcc/configure
++--- gcc-11.2.0.orig/gcc/configure	2021-07-28 14:55:07.172285700 +0800
+++++ gcc-11.2.0/gcc/configure	2021-08-02 21:13:23.259381000 +0800
++@@ -1580,6 +1580,8 @@
++   eval ac_cv_env_${ac_var}_value=\$${ac_var}
++ done
++ 
+++[[ "$(uname)" == MINGW* && -n "${srcdir}" ]] && srcdir="$(cygpath -m ${srcdir})"
+++
++ #
++ # Report the --help message.
++ #
+diff --git a/packages/gcc/7.5.0/0100-configure.patch b/packages/gcc/7.5.0/0100-configure.patch
+new file mode 100644
+index 00000000..109fa429
+--- /dev/null
++++ b/packages/gcc/7.5.0/0100-configure.patch
+@@ -0,0 +1,28 @@
++diff -durN gcc-7.5.0.orig/configure gcc-7.5.0/configure
++--- gcc-7.5.0.orig/configure	2018-06-23 05:16:41.433339000 +0800
+++++ gcc-7.5.0/configure	2021-01-24 21:04:53.779032900 +0800
++@@ -1384,6 +1384,8 @@
++   eval ac_cv_env_${ac_var}_value=\$${ac_var}
++ done
++ 
+++[[ "$(uname)" == MINGW* && -n "${srcdir}" ]] && srcdir="$(cygpath -m ${srcdir})"
+++
++ #
++ # Report the --help message.
++ #
++@@ -7579,6 +7581,15 @@
++     ;;
++ esac
++ 
+++# Check whether --with-local-prefix was given.
+++if test "${with_local_prefix+set}" = set; then :
+++  withval=$with_local_prefix;
+++  if [ "$withval" != "" ] && [ -d "$withval/include" ] &&
+++	! (grep -qP "\-isystem\s+$withval/include" <<< ${FLAGS_FOR_TARGET}); then
+++     FLAGS_FOR_TARGET=$FLAGS_FOR_TARGET" -isystem $withval/include"
+++  fi
+++fi
+++
++ # Makefile fragments.
++ for frag in host_makefile_frag target_makefile_frag alphaieee_frag ospace_frag;
++ do
+diff --git a/packages/gcc/7.5.0/0101-libgcc-configure.patch b/packages/gcc/7.5.0/0101-libgcc-configure.patch
+new file mode 100644
+index 00000000..9693e7fd
+--- /dev/null
++++ b/packages/gcc/7.5.0/0101-libgcc-configure.patch
+@@ -0,0 +1,12 @@
++diff -durN gcc-7.5.0.orig/libgcc/configure gcc-7.5.0/libgcc/configure
++--- gcc-7.5.0.orig/libgcc/configure	2018-06-23 05:16:41.433339000 +0800
+++++ gcc-7.5.0/libgcc/configure	2021-01-24 21:06:48.356460200 +0800
++@@ -1223,6 +1223,8 @@
++   eval ac_cv_env_${ac_var}_value=\$${ac_var}
++ done
++ 
+++[[ "$(uname)" == MINGW* && -n "${srcdir}" ]] && srcdir="$(cygpath -m ${srcdir})"
+++
++ #
++ # Report the --help message.
++ #
+diff --git a/packages/gcc/7.5.0/0102-libgcc-mkheader_sh.patch b/packages/gcc/7.5.0/0102-libgcc-mkheader_sh.patch
+new file mode 100644
+index 00000000..a0f198e2
+--- /dev/null
++++ b/packages/gcc/7.5.0/0102-libgcc-mkheader_sh.patch
+@@ -0,0 +1,15 @@
++diff -durN gcc-7.5.0.orig/libgcc/mkheader.sh gcc-7.5.0/libgcc/mkheader.sh
++--- gcc-7.5.0.orig/libgcc/mkheader.sh	2017-01-01 20:07:43.905435000 +0800
+++++ gcc-7.5.0/libgcc/mkheader.sh	2021-01-24 21:08:12.091628300 +0800
++@@ -34,7 +34,11 @@
++ done
++ 
++ for file in $HEADERS; do
+++if [[ "$(uname)" == MINGW* ]]; then
+++	echo "#include \"$(cygpath -m $file)\""
+++else
++     echo "#include \"$file\""
+++fi
++ done
++ 
++ # Add multiple inclusion protection guard, part two.
+diff --git a/packages/gcc/7.5.0/0103-port-for-cortex-m.patch b/packages/gcc/7.5.0/0103-port-for-cortex-m.patch
+new file mode 100644
+index 00000000..da5655f5
+--- /dev/null
++++ b/packages/gcc/7.5.0/0103-port-for-cortex-m.patch
+@@ -0,0 +1,160 @@
++diff -durN gcc-7.5.0.orig/gcc/config/arm/arm.c gcc-7.5.0/gcc/config/arm/arm.c
++--- gcc-7.5.0.orig/gcc/config/arm/arm.c	2019-10-25 22:39:06.830434000 +0800
+++++ gcc-7.5.0/gcc/config/arm/arm.c	2021-01-24 21:10:27.370900100 +0800
++@@ -3267,6 +3267,32 @@
++       target_fpu_name = "vfp";
++ #endif
++ 
+++	switch(global_options.x_arm_cpu_option)
+++	{
+++		case TARGET_CPU_cortexm4:
+++		case TARGET_CPU_cortexm7:
+++			target_fpu_name = "fpv4-sp-d16";
+++			break;
+++		case TARGET_CPU_cortexr4:
+++		case TARGET_CPU_cortexr4f:
+++		case TARGET_CPU_cortexr5:
+++		case TARGET_CPU_cortexr7:
+++			target_fpu_name = "vfpv3";
+++			break;
+++		case TARGET_CPU_cortexa5:
+++		case TARGET_CPU_cortexa7:
+++			target_fpu_name = "vfpv4-d16";
+++			break;
+++		case TARGET_CPU_cortexa8:
+++		case TARGET_CPU_cortexa9:
+++			target_fpu_name = "vfpv3";
+++			break;
+++		case TARGET_CPU_cortexa12:
+++		case TARGET_CPU_cortexa15:
+++			target_fpu_name = "vfpv4";
+++			break;
+++	}
+++
++       ok = opt_enum_arg_to_value (OPT_mfpu_, target_fpu_name, &fpu_index,
++ 				  CL_TARGET);
++       gcc_assert (ok);
++diff -durN gcc-7.5.0.orig/gcc/config/arm/t-arm-elf gcc-7.5.0/gcc/config/arm/t-arm-elf
++--- gcc-7.5.0.orig/gcc/config/arm/t-arm-elf	2017-01-01 20:07:43.905435000 +0800
+++++ gcc-7.5.0/gcc/config/arm/t-arm-elf	2021-01-24 21:10:27.388188500 +0800
++@@ -38,12 +38,18 @@
++ # Not quite true.  We can support hard-vfp calling in Thumb2, but how do we
++ # express that here?  Also, we really need architecture v5e or later
++ # (mcrr etc).
+++# Additional filtering will remove mfloat-abi=hard on thumb for all non-supported cores
+++#*mthumb/*mfloat-abi=hard*
++ MULTILIB_OPTIONS       += mfloat-abi=hard
++ MULTILIB_DIRNAMES      += fpu
++-MULTILIB_EXCEPTIONS    += *mthumb/*mfloat-abi=hard*
+++MULTILIB_EXCEPTIONS    += 
++ #MULTILIB_EXCEPTIONS    += *mcpu=fa526/*mfloat-abi=hard*
++ #MULTILIB_EXCEPTIONS    += *mcpu=fa626/*mfloat-abi=hard*
++ 
+++MULTILIB_OPTIONS += mcpu=cortex-a15/mcpu=cortex-a5/mcpu=cortex-a7/mcpu=cortex-a8/mcpu=cortex-a9/mcpu=cortex-m0/mcpu=cortex-m0plus/mcpu=cortex-m1/mcpu=cortex-m3/mcpu=cortex-m4/mcpu=cortex-m7/mcpu=cortex-r4/mcpu=cortex-r4f/mcpu=cortex-r5
+++MULTILIB_DIRNAMES += cortex_a15 cortex_a5 cortex_a7 cortex_a8 cortex_a9 cortex_m0 cortex_m0plus cortex_m1 cortex_m3 cortex_m4 cortex_m7 cortex_r4 cortex_r4f cortex_r5
+++#MULTILIB_EXCEPTIONS += 
+++
++ # MULTILIB_OPTIONS    += mcpu=ep9312
++ # MULTILIB_DIRNAMES   += ep9312
++ # MULTILIB_EXCEPTIONS += *mthumb/*mcpu=ep9312*
++diff -durN gcc-7.5.0.orig/gcc/genmultilib gcc-7.5.0/gcc/genmultilib
++--- gcc-7.5.0.orig/gcc/genmultilib	2017-01-01 20:07:43.905435000 +0800
+++++ gcc-7.5.0/gcc/genmultilib	2021-01-24 21:10:27.398191900 +0800
++@@ -140,6 +140,7 @@
++ multiarch=$9
++ multilib_reuse=${10}
++ enable_multilib=${11}
+++target_noncanonical=${12}
++ 
++ echo "static const char *const multilib_raw[] = {"
++ 
++@@ -241,6 +242,10 @@
++ 
++ fi
++ 
+++if [ -e ../$(dirname $0)/genmultilib_filter_${target_noncanonical} ]; then
+++   combinations=`perl ../$(dirname $0)/genmultilib_filter_${target_noncanonical} ${combinations}`
+++fi
+++
++ # Construct a sed pattern which will convert option names to directory
++ # names.
++ todirnames=
++diff -durN gcc-7.5.0.orig/gcc/genmultilib_filter_arm-eabi gcc-7.5.0/gcc/genmultilib_filter_arm-eabi
++--- gcc-7.5.0.orig/gcc/genmultilib_filter_arm-eabi	1970-01-01 08:00:00.000000000 +0800
+++++ gcc-7.5.0/gcc/genmultilib_filter_arm-eabi	2021-01-24 21:10:27.398191900 +0800
++@@ -0,0 +1,12 @@
+++#!/bin/perl
+++
+++foreach (@ARGV)
+++{
+++	next if (/\/mcpu=cortex-m/ && !/\/mthumb\//);
+++	next if (!/\/mcpu=cortex-/ && /\/mthumb\// && /\/mfloat-abi=hard\//);
+++	next if (/\/mcpu=cortex-m0/ && /\/mthumb\// && /\/mfloat-abi=hard\//);
+++	next if (/\/mcpu=cortex-m1/ && /\/mthumb\// && /\/mfloat-abi=hard\//);
+++	
+++	print;
+++	print " ";
+++}
++diff -durN gcc-7.5.0.orig/gcc/Makefile.in gcc-7.5.0/gcc/Makefile.in
++--- gcc-7.5.0.orig/gcc/Makefile.in	2017-05-03 00:12:40.965506000 +0800
+++++ gcc-7.5.0/gcc/Makefile.in	2021-01-24 21:10:27.408192500 +0800
++@@ -2021,6 +2021,7 @@
++ 	    "$(if $(MULTILIB_OSDIRNAMES),,$(MULTIARCH_DIRNAME))" \
++ 	    "$(MULTILIB_REUSE)" \
++ 	    "@enable_multilib@" \
+++		"$(target_noncanonical)" \
++ 	    > tmp-mlib.h; \
++ 	else \
++ 	  $(SHELL) $(srcdir)/genmultilib '' '' '' '' '' '' '' '' \
++diff -durN gcc-7.5.0.orig/libgcc/crtstuff.c gcc-7.5.0/libgcc/crtstuff.c
++--- gcc-7.5.0.orig/libgcc/crtstuff.c	2017-01-01 20:07:43.905435000 +0800
+++++ gcc-7.5.0/libgcc/crtstuff.c	2021-01-24 21:10:27.418200700 +0800
++@@ -51,6 +51,7 @@
++ /* FIXME: Including auto-host is incorrect, but until we have
++    identified the set of defines that need to go into auto-target.h,
++    this will have to do.  */
+++#define USED_FOR_TARGET
++ #include "auto-host.h"
++ #undef caddr_t
++ #undef pid_t
++diff -durN gcc-7.5.0.orig/libstdc++-v3/libsupc++/eh_terminate.cc gcc-7.5.0/libstdc++-v3/libsupc++/eh_terminate.cc
++--- gcc-7.5.0.orig/libstdc++-v3/libsupc++/eh_terminate.cc	2017-01-01 20:07:43.905435000 +0800
+++++ gcc-7.5.0/libstdc++-v3/libsupc++/eh_terminate.cc	2021-01-24 21:10:27.428201200 +0800
++@@ -51,7 +51,7 @@
++     { std::abort (); }
++ }
++ 
++-void
+++void __attribute__((weak))
++ std::terminate () throw()
++ {
++   __terminate (get_terminate ());
++@@ -64,7 +64,7 @@
++   std::terminate ();
++ }
++ 
++-void
+++void __attribute__((weak))
++ std::unexpected ()
++ {
++   __unexpected (get_unexpected ());
++diff -durN gcc-7.5.0.orig/libstdc++-v3/libsupc++/pure.cc gcc-7.5.0/libstdc++-v3/libsupc++/pure.cc
++--- gcc-7.5.0.orig/libstdc++-v3/libsupc++/pure.cc	2017-01-01 20:07:43.905435000 +0800
+++++ gcc-7.5.0/libstdc++-v3/libsupc++/pure.cc	2021-01-24 21:10:27.438201800 +0800
++@@ -43,14 +43,14 @@
++ # define writestr(str) /* Empty */
++ #endif
++ 
++-extern "C" void
+++extern "C" void __attribute__((weak))
++ __cxxabiv1::__cxa_pure_virtual (void)
++ {
++   writestr ("pure virtual method called\n");
++   std::terminate ();
++ }
++ 
++-extern "C" void
+++extern "C" void __attribute__((weak))
++ __cxxabiv1::__cxa_deleted_virtual (void)
++ {
++   writestr ("deleted virtual method called\n");
+diff --git a/packages/gcc/7.5.0/0104-gcc-configure.patch b/packages/gcc/7.5.0/0104-gcc-configure.patch
+new file mode 100644
+index 00000000..dfb990f0
+--- /dev/null
++++ b/packages/gcc/7.5.0/0104-gcc-configure.patch
+@@ -0,0 +1,12 @@
++diff -durN gcc-7.5.0.orig/gcc/configure gcc-7.5.0/gcc/configure
++--- gcc-7.5.0.orig/gcc/configure	2018-06-23 05:16:41.433339000 +0800
+++++ gcc-7.5.0/gcc/configure	2021-01-24 21:12:16.935546600 +0800
++@@ -1505,6 +1505,8 @@
++   eval ac_cv_env_${ac_var}_value=\$${ac_var}
++ done
++ 
+++[[ "$(uname)" == MINGW* && -n "${srcdir}" ]] && srcdir="$(cygpath -m ${srcdir})"
+++
++ #
++ # Report the --help message.
++ #
+diff --git a/packages/gcc/8.5.0/0100-configure.patch b/packages/gcc/8.5.0/0100-configure.patch
+new file mode 100644
+index 00000000..38255bfe
+--- /dev/null
++++ b/packages/gcc/8.5.0/0100-configure.patch
+@@ -0,0 +1,28 @@
++diff -durN gcc-8.4.0.orig/configure gcc-8.4.0/configure
++--- gcc-8.4.0.orig/configure	2020-03-04 16:32:13.000000000 +0800
+++++ gcc-8.4.0/configure	2021-01-24 20:39:06.666686000 +0800
++@@ -1384,6 +1384,8 @@
++   eval ac_cv_env_${ac_var}_value=\$${ac_var}
++ done
++ 
+++[[ "$(uname)" == MINGW* && -n "${srcdir}" ]] && srcdir="$(cygpath -m ${srcdir})"
+++
++ #
++ # Report the --help message.
++ #
++@@ -7614,6 +7616,15 @@
++     ;;
++ esac
++ 
+++# Check whether --with-local-prefix was given.
+++if test "${with_local_prefix+set}" = set; then :
+++  withval=$with_local_prefix;
+++  if [ "$withval" != "" ] && [ -d "$withval/include" ] &&
+++	! (grep -qP "\-isystem\s+$withval/include" <<< ${FLAGS_FOR_TARGET}); then
+++     FLAGS_FOR_TARGET=$FLAGS_FOR_TARGET" -isystem $withval/include"
+++  fi
+++fi
+++
++ # Makefile fragments.
++ for frag in host_makefile_frag target_makefile_frag alphaieee_frag ospace_frag;
++ do
+diff --git a/packages/gcc/8.5.0/0101-libgcc-configure.patch b/packages/gcc/8.5.0/0101-libgcc-configure.patch
+new file mode 100644
+index 00000000..582a83b8
+--- /dev/null
++++ b/packages/gcc/8.5.0/0101-libgcc-configure.patch
+@@ -0,0 +1,12 @@
++diff -durN gcc-8.4.0.orig/libgcc/configure gcc-8.4.0/libgcc/configure
++--- gcc-8.4.0.orig/libgcc/configure	2020-03-04 16:30:03.000000000 +0800
+++++ gcc-8.4.0/libgcc/configure	2021-01-24 20:41:20.955780200 +0800
++@@ -1225,6 +1225,8 @@
++   eval ac_cv_env_${ac_var}_value=\$${ac_var}
++ done
++ 
+++[[ "$(uname)" == MINGW* && -n "${srcdir}" ]] && srcdir="$(cygpath -m ${srcdir})"
+++
++ #
++ # Report the --help message.
++ #
+diff --git a/packages/gcc/8.5.0/0102-libgcc-mkheader_sh.patch b/packages/gcc/8.5.0/0102-libgcc-mkheader_sh.patch
+new file mode 100644
+index 00000000..2339c5ba
+--- /dev/null
++++ b/packages/gcc/8.5.0/0102-libgcc-mkheader_sh.patch
+@@ -0,0 +1,15 @@
++diff -durN gcc-8.4.0.orig/libgcc/mkheader.sh gcc-8.4.0/libgcc/mkheader.sh
++--- gcc-8.4.0.orig/libgcc/mkheader.sh	2020-03-04 16:30:03.000000000 +0800
+++++ gcc-8.4.0/libgcc/mkheader.sh	2021-01-24 20:43:12.839065600 +0800
++@@ -34,7 +34,11 @@
++ done
++ 
++ for file in $HEADERS; do
+++if [[ "$(uname)" == MINGW* ]]; then
+++	echo "#include \"$(cygpath -m $file)\""
+++else
++     echo "#include \"$file\""
+++fi
++ done
++ 
++ # Add multiple inclusion protection guard, part two.
+diff --git a/packages/gcc/8.5.0/0103-port-for-cortex-m.patch b/packages/gcc/8.5.0/0103-port-for-cortex-m.patch
+new file mode 100644
+index 00000000..2af56b11
+--- /dev/null
++++ b/packages/gcc/8.5.0/0103-port-for-cortex-m.patch
+@@ -0,0 +1,165 @@
++diff -durN gcc-8.4.0.orig/gcc/config/arm/arm.c gcc-8.4.0/gcc/config/arm/arm.c
++--- gcc-8.4.0.orig/gcc/config/arm/arm.c	2020-03-04 16:30:00.000000000 +0800
+++++ gcc-8.4.0/gcc/config/arm/arm.c	2021-01-24 20:45:02.125004600 +0800
++@@ -3375,10 +3375,45 @@
++ 
++   if (!global_options_set.x_arm_fpu_index)
++     {
+++	  const char *target_fpu_name;
++       bool ok;
++       int fpu_index;
++ 
++-      ok = opt_enum_arg_to_value (OPT_mfpu_, FPUTYPE_AUTO, &fpu_index,
+++#ifdef FPUTYPE_AUTO
+++      target_fpu_name = FPUTYPE_AUTO;
+++#else
+++      target_fpu_name = "auto";
+++#endif
+++
+++      if (global_options.x_arm_cpu_string == "cortex-m4" ||
+++		  global_options.x_arm_cpu_string == "cortex-m7")
+++	  {
+++      	target_fpu_name = "fpv4-sp-d16";
+++	  }
+++	  else if (global_options.x_arm_cpu_string == "cortex-r4" ||
+++			   global_options.x_arm_cpu_string == "cortex-r4f" ||
+++			   global_options.x_arm_cpu_string == "cortex-r5" ||
+++			   global_options.x_arm_cpu_string == "cortex-r7")
+++	  {
+++      	target_fpu_name = "vfpv3";
+++      }
+++	  else if (global_options.x_arm_cpu_string == "cortex-a5" ||
+++			   global_options.x_arm_cpu_string == "cortex-a7")
+++	  {
+++      	target_fpu_name = "vfpv4-d16";
+++	  }
+++	  else if (global_options.x_arm_cpu_string == "cortex-a8" ||
+++			   global_options.x_arm_cpu_string == "cortex-a9")
+++	  {
+++      	target_fpu_name = "vfpv3";
+++	  }
+++	  else if (global_options.x_arm_cpu_string == "cortex-a12" ||
+++			   global_options.x_arm_cpu_string == "cortex-a15")
+++	  {
+++      	target_fpu_name = "vfpv4";
+++	  }
+++
+++      ok = opt_enum_arg_to_value (OPT_mfpu_, target_fpu_name, &fpu_index,
++ 				  CL_TARGET);
++       gcc_assert (ok);
++       arm_fpu_index = (enum fpu_type) fpu_index;
++diff -durN gcc-8.4.0.orig/gcc/config/arm/t-arm-elf gcc-8.4.0/gcc/config/arm/t-arm-elf
++--- gcc-8.4.0.orig/gcc/config/arm/t-arm-elf	2020-03-04 16:30:00.000000000 +0800
+++++ gcc-8.4.0/gcc/config/arm/t-arm-elf	2021-01-24 20:45:02.141360000 +0800
++@@ -75,6 +75,10 @@
++ MULTILIB_OPTIONS     += mfloat-abi=hard
++ MULTILIB_DIRNAMES    += fpu
++ 
+++MULTILIB_OPTIONS += mcpu=cortex-a15/mcpu=cortex-a5/mcpu=cortex-a7/mcpu=cortex-a8/mcpu=cortex-a9/mcpu=cortex-m0/mcpu=cortex-m0plus/mcpu=cortex-m1/mcpu=cortex-m3/mcpu=cortex-m4/mcpu=cortex-m7/mcpu=cortex-r4/mcpu=cortex-r4f/mcpu=cortex-r5
+++MULTILIB_DIRNAMES += cortex_a15 cortex_a5 cortex_a7 cortex_a8 cortex_a9 cortex_m0 cortex_m0plus cortex_m1 cortex_m3 cortex_m4 cortex_m7 cortex_r4 cortex_r4f cortex_r5
+++#MULTILIB_EXCEPTIONS += 
+++
++ # Build a total of 4 library variants (base options plus the following):
++ MULTILIB_REQUIRED    += mthumb
++ MULTILIB_REQUIRED    += marm/mfpu=auto/march=armv5te+fp/mfloat-abi=hard
++diff -durN gcc-8.4.0.orig/gcc/genmultilib gcc-8.4.0/gcc/genmultilib
++--- gcc-8.4.0.orig/gcc/genmultilib	2020-03-04 16:30:00.000000000 +0800
+++++ gcc-8.4.0/gcc/genmultilib	2021-01-24 20:45:02.141360000 +0800
++@@ -140,6 +140,7 @@
++ multiarch=$9
++ multilib_reuse=${10}
++ enable_multilib=${11}
+++target_noncanonical=${12}
++ 
++ echo "static const char *const multilib_raw[] = {"
++ 
++@@ -240,6 +241,10 @@
++ 
++ fi
++ 
+++if [ -e ../$(dirname $0)/genmultilib_filter_${target_noncanonical} ]; then
+++   combinations=`perl ../$(dirname $0)/genmultilib_filter_${target_noncanonical} ${combinations}`
+++fi
+++
++ # Construct a sed pattern which will convert option names to directory
++ # names.
++ todirnames=
++diff -durN gcc-8.4.0.orig/gcc/genmultilib_filter_arm-eabi gcc-8.4.0/gcc/genmultilib_filter_arm-eabi
++--- gcc-8.4.0.orig/gcc/genmultilib_filter_arm-eabi	1970-01-01 08:00:00.000000000 +0800
+++++ gcc-8.4.0/gcc/genmultilib_filter_arm-eabi	2021-01-24 20:45:02.151363100 +0800
++@@ -0,0 +1,12 @@
+++#!/bin/perl
+++
+++foreach (@ARGV)
+++{
+++	next if (/\/mcpu=cortex-m/ && !/\/mthumb\//);
+++	next if (!/\/mcpu=cortex-/ && /\/mthumb\// && /\/mfloat-abi=hard\//);
+++	next if (/\/mcpu=cortex-m0/ && /\/mthumb\// && /\/mfloat-abi=hard\//);
+++	next if (/\/mcpu=cortex-m1/ && /\/mthumb\// && /\/mfloat-abi=hard\//);
+++	
+++	print;
+++	print " ";
+++}
++diff -durN gcc-8.4.0.orig/gcc/Makefile.in gcc-8.4.0/gcc/Makefile.in
++--- gcc-8.4.0.orig/gcc/Makefile.in	2020-03-04 16:30:00.000000000 +0800
+++++ gcc-8.4.0/gcc/Makefile.in	2021-01-24 20:45:02.161363100 +0800
++@@ -2088,6 +2088,7 @@
++ 	    "$(if $(MULTILIB_OSDIRNAMES),,$(MULTIARCH_DIRNAME))" \
++ 	    "$(MULTILIB_REUSE)" \
++ 	    "@enable_multilib@" \
+++		"$(target_noncanonical)" \
++ 	    > tmp-mlib.h; \
++ 	else \
++ 	  $(SHELL) $(srcdir)/genmultilib '' '' '' '' '' '' '' '' \
++diff -durN gcc-8.4.0.orig/libgcc/crtstuff.c gcc-8.4.0/libgcc/crtstuff.c
++--- gcc-8.4.0.orig/libgcc/crtstuff.c	2020-03-04 16:30:03.000000000 +0800
+++++ gcc-8.4.0/libgcc/crtstuff.c	2021-01-24 20:45:02.171372000 +0800
++@@ -51,6 +51,7 @@
++ /* FIXME: Including auto-host is incorrect, but until we have
++    identified the set of defines that need to go into auto-target.h,
++    this will have to do.  */
+++#define USED_FOR_TARGET
++ #include "auto-host.h"
++ #undef caddr_t
++ #undef pid_t
++diff -durN gcc-8.4.0.orig/libstdc++-v3/libsupc++/eh_terminate.cc gcc-8.4.0/libstdc++-v3/libsupc++/eh_terminate.cc
++--- gcc-8.4.0.orig/libstdc++-v3/libsupc++/eh_terminate.cc	2020-03-04 16:30:03.000000000 +0800
+++++ gcc-8.4.0/libstdc++-v3/libsupc++/eh_terminate.cc	2021-01-24 20:45:02.181372100 +0800
++@@ -51,7 +51,7 @@
++     { std::abort (); }
++ }
++ 
++-void
+++void __attribute__((weak))
++ std::terminate () throw()
++ {
++   __terminate (get_terminate ());
++@@ -64,7 +64,7 @@
++   std::terminate ();
++ }
++ 
++-void
+++void __attribute__((weak))
++ std::unexpected ()
++ {
++   __unexpected (get_unexpected ());
++diff -durN gcc-8.4.0.orig/libstdc++-v3/libsupc++/pure.cc gcc-8.4.0/libstdc++-v3/libsupc++/pure.cc
++--- gcc-8.4.0.orig/libstdc++-v3/libsupc++/pure.cc	2020-03-04 16:30:03.000000000 +0800
+++++ gcc-8.4.0/libstdc++-v3/libsupc++/pure.cc	2021-01-24 20:45:02.181372100 +0800
++@@ -43,14 +43,14 @@
++ # define writestr(str) /* Empty */
++ #endif
++ 
++-extern "C" void
+++extern "C" void __attribute__((weak))
++ __cxxabiv1::__cxa_pure_virtual (void)
++ {
++   writestr ("pure virtual method called\n");
++   std::terminate ();
++ }
++ 
++-extern "C" void
+++extern "C" void __attribute__((weak))
++ __cxxabiv1::__cxa_deleted_virtual (void)
++ {
++   writestr ("deleted virtual method called\n");
+diff --git a/packages/gcc/8.5.0/0104-gcc-configure.patch b/packages/gcc/8.5.0/0104-gcc-configure.patch
+new file mode 100644
+index 00000000..78f3e726
+--- /dev/null
++++ b/packages/gcc/8.5.0/0104-gcc-configure.patch
+@@ -0,0 +1,12 @@
++diff -durN gcc-8.4.0.orig/gcc/configure gcc-8.4.0/gcc/configure
++--- gcc-8.4.0.orig/gcc/configure	2020-03-04 16:32:12.000000000 +0800
+++++ gcc-8.4.0/gcc/configure	2021-01-24 20:50:44.819691300 +0800
++@@ -1512,6 +1512,8 @@
++   eval ac_cv_env_${ac_var}_value=\$${ac_var}
++ done
++ 
+++[[ "$(uname)" == MINGW* && -n "${srcdir}" ]] && srcdir="$(cygpath -m ${srcdir})"
+++
++ #
++ # Report the --help message.
++ #
+diff --git a/packages/gcc/9.4.0/0100-configure.patch b/packages/gcc/9.4.0/0100-configure.patch
+new file mode 100644
+index 00000000..ac60ed9d
+--- /dev/null
++++ b/packages/gcc/9.4.0/0100-configure.patch
+@@ -0,0 +1,28 @@
++diff -durN gcc-9.3.0.orig/configure gcc-9.3.0/configure
++--- gcc-9.3.0.orig/configure	2020-03-12 19:08:30.000000000 +0800
+++++ gcc-9.3.0/configure	2021-01-24 19:15:09.645848600 +0800
++@@ -1421,6 +1421,8 @@
++   eval ac_cv_env_${ac_var}_value=\$${ac_var}
++ done
++ 
+++[[ "$(uname)" == MINGW* && -n "${srcdir}" ]] && srcdir="$(cygpath -m ${srcdir})"
+++
++ #
++ # Report the --help message.
++ #
++@@ -7710,6 +7712,15 @@
++     ;;
++ esac
++ 
+++# Check whether --with-local-prefix was given.
+++if test "${with_local_prefix+set}" = set; then :
+++  withval=$with_local_prefix;
+++  if [ "$withval" != "" ] && [ -d "$withval/include" ] &&
+++	! (grep -qP "\-isystem\s+$withval/include" <<< ${FLAGS_FOR_TARGET}); then
+++     FLAGS_FOR_TARGET=$FLAGS_FOR_TARGET" -isystem $withval/include"
+++  fi
+++fi
+++
++ # Makefile fragments.
++ for frag in host_makefile_frag target_makefile_frag alphaieee_frag ospace_frag;
++ do
+diff --git a/packages/gcc/9.4.0/0101-libgcc-configure.patch b/packages/gcc/9.4.0/0101-libgcc-configure.patch
+new file mode 100644
+index 00000000..247f5fe4
+--- /dev/null
++++ b/packages/gcc/9.4.0/0101-libgcc-configure.patch
+@@ -0,0 +1,12 @@
++diff -durN gcc-9.3.0.orig/libgcc/configure gcc-9.3.0/libgcc/configure
++--- gcc-9.3.0.orig/libgcc/configure	2020-03-12 19:07:23.000000000 +0800
+++++ gcc-9.3.0/libgcc/configure	2021-01-24 19:41:07.279871700 +0800
++@@ -1258,6 +1258,8 @@
++   eval ac_cv_env_${ac_var}_value=\$${ac_var}
++ done
++ 
+++[[ "$(uname)" == MINGW* && -n "${srcdir}" ]] && srcdir="$(cygpath -m ${srcdir})"
+++
++ #
++ # Report the --help message.
++ #
+diff --git a/packages/gcc/9.4.0/0102-libgcc-mkheader_sh.patch b/packages/gcc/9.4.0/0102-libgcc-mkheader_sh.patch
+new file mode 100644
+index 00000000..40231e8a
+--- /dev/null
++++ b/packages/gcc/9.4.0/0102-libgcc-mkheader_sh.patch
+@@ -0,0 +1,15 @@
++diff -durN gcc-9.3.0.orig/libgcc/mkheader.sh gcc-9.3.0/libgcc/mkheader.sh
++--- gcc-9.3.0.orig/libgcc/mkheader.sh	2020-03-12 19:07:23.000000000 +0800
+++++ gcc-9.3.0/libgcc/mkheader.sh	2021-01-24 19:44:13.872914400 +0800
++@@ -34,7 +34,11 @@
++ done
++ 
++ for file in $HEADERS; do
+++if [[ "$(uname)" == MINGW* ]]; then
+++	echo "#include \"$(cygpath -m $file)\""
+++else
++     echo "#include \"$file\""
+++fi
++ done
++ 
++ # Add multiple inclusion protection guard, part two.
+diff --git a/packages/gcc/9.4.0/0103-port-for-cortex-m.patch b/packages/gcc/9.4.0/0103-port-for-cortex-m.patch
+new file mode 100644
+index 00000000..328de00a
+--- /dev/null
++++ b/packages/gcc/9.4.0/0103-port-for-cortex-m.patch
+@@ -0,0 +1,165 @@
++diff -durN gcc-9.3.0.orig/gcc/config/arm/arm.c gcc-9.3.0/gcc/config/arm/arm.c
++--- gcc-9.3.0.orig/gcc/config/arm/arm.c	2020-03-12 19:07:21.000000000 +0800
+++++ gcc-9.3.0/gcc/config/arm/arm.c	2021-01-24 19:48:31.746381500 +0800
++@@ -3382,10 +3382,45 @@
++ 
++   if (!global_options_set.x_arm_fpu_index)
++     {
+++      const char *target_fpu_name;
++       bool ok;
++       int fpu_index;
++ 
++-      ok = opt_enum_arg_to_value (OPT_mfpu_, FPUTYPE_AUTO, &fpu_index,
+++#ifdef FPUTYPE_AUTO
+++      target_fpu_name = FPUTYPE_AUTO;
+++#else
+++      target_fpu_name = "auto";
+++#endif
+++
+++      if (global_options.x_arm_cpu_string == "cortex-m4" ||
+++		  global_options.x_arm_cpu_string == "cortex-m7")
+++	  {
+++      	target_fpu_name = "fpv4-sp-d16";
+++	  }
+++	  else if (global_options.x_arm_cpu_string == "cortex-r4" ||
+++			   global_options.x_arm_cpu_string == "cortex-r4f" ||
+++			   global_options.x_arm_cpu_string == "cortex-r5" ||
+++			   global_options.x_arm_cpu_string == "cortex-r7")
+++	  {
+++      	target_fpu_name = "vfpv3";
+++      }
+++	  else if (global_options.x_arm_cpu_string == "cortex-a5" ||
+++			   global_options.x_arm_cpu_string == "cortex-a7")
+++	  {
+++      	target_fpu_name = "vfpv4-d16";
+++	  }
+++	  else if (global_options.x_arm_cpu_string == "cortex-a8" ||
+++			   global_options.x_arm_cpu_string == "cortex-a9")
+++	  {
+++      	target_fpu_name = "vfpv3";
+++	  }
+++	  else if (global_options.x_arm_cpu_string == "cortex-a12" ||
+++			   global_options.x_arm_cpu_string == "cortex-a15")
+++	  {
+++      	target_fpu_name = "vfpv4";
+++	  }
+++
+++      ok = opt_enum_arg_to_value (OPT_mfpu_, target_fpu_name, &fpu_index,
++ 				  CL_TARGET);
++       gcc_assert (ok);
++       arm_fpu_index = (enum fpu_type) fpu_index;
++diff -durN gcc-9.3.0.orig/gcc/config/arm/t-arm-elf gcc-9.3.0/gcc/config/arm/t-arm-elf
++--- gcc-9.3.0.orig/gcc/config/arm/t-arm-elf	2020-03-12 19:07:21.000000000 +0800
+++++ gcc-9.3.0/gcc/config/arm/t-arm-elf	2021-01-24 19:51:51.957619200 +0800
++@@ -76,6 +76,10 @@
++ MULTILIB_OPTIONS     += mfloat-abi=hard
++ MULTILIB_DIRNAMES    += fpu
++ 
+++MULTILIB_OPTIONS += mcpu=cortex-a15/mcpu=cortex-a5/mcpu=cortex-a7/mcpu=cortex-a8/mcpu=cortex-a9/mcpu=cortex-m0/mcpu=cortex-m0plus/mcpu=cortex-m1/mcpu=cortex-m3/mcpu=cortex-m4/mcpu=cortex-m7/mcpu=cortex-r4/mcpu=cortex-r4f/mcpu=cortex-r5
+++MULTILIB_DIRNAMES += cortex_a15 cortex_a5 cortex_a7 cortex_a8 cortex_a9 cortex_m0 cortex_m0plus cortex_m1 cortex_m3 cortex_m4 cortex_m7 cortex_r4 cortex_r4f cortex_r5
+++#MULTILIB_EXCEPTIONS += 
+++
++ # Build a total of 4 library variants (base options plus the following):
++ MULTILIB_REQUIRED    += mthumb
++ MULTILIB_REQUIRED    += marm/mfpu=auto/march=armv5te+fp/mfloat-abi=hard
++diff -durN gcc-9.3.0.orig/gcc/genmultilib gcc-9.3.0/gcc/genmultilib
++--- gcc-9.3.0.orig/gcc/genmultilib	2020-03-12 19:07:21.000000000 +0800
+++++ gcc-9.3.0/gcc/genmultilib	2021-01-24 19:54:05.853637000 +0800
++@@ -140,6 +140,7 @@
++ multiarch=$9
++ multilib_reuse=${10}
++ enable_multilib=${11}
+++target_noncanonical=${12}
++ 
++ echo "static const char *const multilib_raw[] = {"
++ 
++@@ -240,6 +241,10 @@
++ 
++ fi
++ 
+++if [ -e ../$(dirname $0)/genmultilib_filter_${target_noncanonical} ]; then
+++   combinations=`perl ../$(dirname $0)/genmultilib_filter_${target_noncanonical} ${combinations}`
+++fi
+++
++ # Construct a sed pattern which will convert option names to directory
++ # names.
++ todirnames=
++diff -durN gcc-9.3.0.orig/gcc/genmultilib_filter_arm-eabi gcc-9.3.0/gcc/genmultilib_filter_arm-eabi
++--- gcc-9.3.0.orig/gcc/genmultilib_filter_arm-eabi	1970-01-01 08:00:00.000000000 +0800
+++++ gcc-9.3.0/gcc/genmultilib_filter_arm-eabi	2021-01-24 19:56:14.807119500 +0800
++@@ -0,0 +1,12 @@
+++#!/bin/perl
+++
+++foreach (@ARGV)
+++{
+++	next if (/\/mcpu=cortex-m/ && !/\/mthumb\//);
+++	next if (!/\/mcpu=cortex-/ && /\/mthumb\// && /\/mfloat-abi=hard\//);
+++	next if (/\/mcpu=cortex-m0/ && /\/mthumb\// && /\/mfloat-abi=hard\//);
+++	next if (/\/mcpu=cortex-m1/ && /\/mthumb\// && /\/mfloat-abi=hard\//);
+++	
+++	print;
+++	print " ";
+++}
++diff -durN gcc-9.3.0.orig/gcc/Makefile.in gcc-9.3.0/gcc/Makefile.in
++--- gcc-9.3.0.orig/gcc/Makefile.in	2020-03-12 19:07:20.000000000 +0800
+++++ gcc-9.3.0/gcc/Makefile.in	2021-01-24 19:57:10.442798800 +0800
++@@ -2063,6 +2063,7 @@
++ 	    "$(if $(MULTILIB_OSDIRNAMES),,$(MULTIARCH_DIRNAME))" \
++ 	    "$(MULTILIB_REUSE)" \
++ 	    "@enable_multilib@" \
+++		"$(target_noncanonical)" \
++ 	    > tmp-mlib.h; \
++ 	else \
++ 	  $(SHELL) $(srcdir)/genmultilib '' '' '' '' '' '' '' '' \
++diff -durN gcc-9.3.0.orig/libgcc/crtstuff.c gcc-9.3.0/libgcc/crtstuff.c
++--- gcc-9.3.0.orig/libgcc/crtstuff.c	2020-03-12 19:07:23.000000000 +0800
+++++ gcc-9.3.0/libgcc/crtstuff.c	2021-01-24 19:58:12.975928000 +0800
++@@ -51,6 +51,7 @@
++ /* FIXME: Including auto-host is incorrect, but until we have
++    identified the set of defines that need to go into auto-target.h,
++    this will have to do.  */
+++#define USED_FOR_TARGET
++ #include "auto-host.h"
++ #undef caddr_t
++ #undef pid_t
++diff -durN gcc-9.3.0.orig/libstdc++-v3/libsupc++/eh_terminate.cc gcc-9.3.0/libstdc++-v3/libsupc++/eh_terminate.cc
++--- gcc-9.3.0.orig/libstdc++-v3/libsupc++/eh_terminate.cc	2020-03-12 19:07:24.000000000 +0800
+++++ gcc-9.3.0/libstdc++-v3/libsupc++/eh_terminate.cc	2021-01-24 20:00:35.023510400 +0800
++@@ -52,7 +52,7 @@
++     { std::abort (); }
++ }
++ 
++-void
+++void __attribute__((weak))
++ std::terminate () throw()
++ {
++   __terminate (get_terminate ());
++@@ -65,7 +65,7 @@
++   std::terminate ();
++ }
++ 
++-void
+++void __attribute__((weak))
++ std::unexpected ()
++ {
++   __unexpected (get_unexpected ());
++diff -durN gcc-9.3.0.orig/libstdc++-v3/libsupc++/pure.cc gcc-9.3.0/libstdc++-v3/libsupc++/pure.cc
++--- gcc-9.3.0.orig/libstdc++-v3/libsupc++/pure.cc	2020-03-12 19:07:24.000000000 +0800
+++++ gcc-9.3.0/libstdc++-v3/libsupc++/pure.cc	2021-01-24 20:01:28.344352700 +0800
++@@ -43,14 +43,14 @@
++ # define writestr(str) /* Empty */
++ #endif
++ 
++-extern "C" void
+++extern "C" void __attribute__((weak))
++ __cxxabiv1::__cxa_pure_virtual (void)
++ {
++   writestr ("pure virtual method called\n");
++   std::terminate ();
++ }
++ 
++-extern "C" void
+++extern "C" void __attribute__((weak))
++ __cxxabiv1::__cxa_deleted_virtual (void)
++ {
++   writestr ("deleted virtual method called\n");
+diff --git a/packages/gcc/9.4.0/0104-gcc-configure.patch b/packages/gcc/9.4.0/0104-gcc-configure.patch
+new file mode 100644
+index 00000000..e3a1e48c
+--- /dev/null
++++ b/packages/gcc/9.4.0/0104-gcc-configure.patch
+@@ -0,0 +1,12 @@
++diff -durN gcc-9.3.0.orig/gcc/configure gcc-9.3.0/gcc/configure
++--- gcc-9.3.0.orig/gcc/configure	2020-03-12 19:08:30.000000000 +0800
+++++ gcc-9.3.0/gcc/configure	2021-01-24 20:20:58.776438000 +0800
++@@ -1553,6 +1553,8 @@
++   eval ac_cv_env_${ac_var}_value=\$${ac_var}
++ done
++ 
+++[[ "$(uname)" == MINGW* && -n "${srcdir}" ]] && srcdir="$(cygpath -m ${srcdir})"
+++
++ #
++ # Report the --help message.
++ #
+-- 
+2.32.0.windows.2
+

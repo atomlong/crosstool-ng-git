@@ -1,42 +1,64 @@
-# -*- shell-script -*-
-# Maintainer: Ivan Shapovalov <intelfx@intelfx.name>
-# Contributor: goodmen <goodmenzy@gmail.com>
+# Maintainer: Ray Donnelly <mingw.android@gmail.com>
+# Maintainer: Martell Malone <martellmalone@gmail.com>
 
-pkgname=crosstool-ng-git
-pkgver=1.24.0.r411.gf3226793
+_realname="crosstool-ng"
+pkgname="$_realname-git"
+replaces=("$_realname")
+pkgver=1.25.0.r155.g1adc236e
 pkgrel=1
-pkgdesc="crosstool-NG aims at building toolchains."
-arch=('x86_64' 'armv6h' 'armv7h' 'aarch64')
-url="http://crosstool-ng.org/"
-license=('GPL')
-depends=('ncurses' 'make' 'rsync' 'unzip')
-makedepends=('git' 'flex' 'bison' 'gperf' 'help2man' 'unzip' 'lzip')
-provides=('crosstool-ng')
-conflicts=('crosstool-ng')
-source=('git://github.com/crosstool-ng/crosstool-ng.git')
-b2sums=('SKIP')
+pkgdesc="A cross-platform open-source toolchain system (git)"
+arch=(i686 x86_64)
+url="http://www.crosstool-ng.org/"
+license=("MIT")
+makedepends=("autoconf" "binutils" "bison" "flex" "git"
+             "gcc" "gperf" "patch" "libtool" "make"
+             "tar" "texinfo" "wget" "xz" "unzip"
+             "help2man" "dos2unix")
+depends=("ncurses" "rsync")
+[ "$(uname -o)" == 'GNU/Linux' ] && {
+makedepends+=("automake" "ncurses" "gettext")
+depends+=("make" "unzip")
+}
+[ "$(uname -o)" == 'Msys' ] && {
+makedepends+=("automake-wrapper" "ncurses-devel" "gettext-devel")
+depends+=("libintl")
+}
+options=('staticlibs' 'strip')
+source=('crosstool-ng::git+https://github.com/crosstool-ng/crosstool-ng.git#branch=master'
+        "0002-Add-new-gmp-patches.patch"
+        "0003-Add-new-gcc-patches.patch"
+        "0004-Add-new-newlib-patches.patch")
+sha256sums=('SKIP'
+            '8ca11b022a033816c498695d2ccd551126b3cb66967e15c70de27dfe7d5453bf'
+            'aac206bef981f37bcd9dedefa6eb7d384a575240a6ab32b0a0b939147ef2db45'
+            'c8c6b814a2ca156e70ad6e654b77d2b2bad416b6fec5a68d2e2530a4f9ef9b20')
 
 pkgver() {
-	cd crosstool-ng
-
-	git describe --long --tags | sed 's/^crosstool-ng-//;s/-rc/rc/;s/-/.r/;s/-/./'
+  cd "${srcdir}/${_realname}"
+  git describe --long --tags | sed 's/^crosstool-ng-//;s/-rc/rc/;s/-/.r/;s/-/./'
 }
 
-#prepare () {
-#	cd crosstool-ng
-# git pull --no-edit origin pull/1368/head
-#}
-
-build () {
-	cd crosstool-ng
-
-	./bootstrap
-	./configure --prefix=/usr
-	make
+prepare() {
+  cd "${srcdir}/${_realname}"
+  
+  patch -p1 -i "${srcdir}/0002-Add-new-gmp-patches.patch"
+  patch -p1 -i "${srcdir}/0003-Add-new-gcc-patches.patch"
+  patch -p1 -i "${srcdir}/0004-Add-new-newlib-patches.patch"
+  find packages/ncurses -type f -name "*.patch" | xargs dos2unix
+  
+  ./bootstrap
 }
 
-package () {
-	cd crosstool-ng
+build() {
+  cd "${srcdir}/${_realname}"
+  ./configure \
+    --build=${CHOST} \
+    --prefix=/usr
 
-	make DESTDIR="$pkgdir" install
+  make
+}
+
+package() {
+  cd "${srcdir}/${_realname}"
+  make DESTDIR=${pkgdir} install
 }
