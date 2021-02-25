@@ -3,7 +3,6 @@
 # Contributor: goodmen <goodmenzy@gmail.com>
 
 pkgname=crosstool-ng-git
-epoch=1
 pkgver=1.24.0.r411.gf3226793
 pkgrel=1
 pkgdesc="crosstool-NG aims at building toolchains."
